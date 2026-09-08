@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect, useRef } from "react";
-import { loadAll } from "./lib/data";
-import { Search, ChevronRight, ChevronLeft, Clock, Wrench, Gauge, ShieldAlert, Play, Quote, ExternalLink, ShoppingCart, ChevronDown, Star, Repeat } from "lucide-react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { loadCatalog, loadTasks, loadGuide, illustrationUrl, submitRequest } from "./lib/data";
+import { Search, ChevronRight, ChevronLeft, Clock, Wrench, Gauge, ShieldAlert, Play, Quote, ExternalLink, ShoppingCart, ChevronDown, Star, Repeat, Zap, X, Maximize2, Check, ThumbsUp, Hourglass, FileClock, MessageSquarePlus, Send } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /* DATA — this is the shape the content pipeline produces (see schema) */
@@ -13,12 +13,54 @@ const C = { interval: { level: "community", n: 4, note: "No factory interval exi
 /* DESIGN TOKENS                                                       */
 /* ------------------------------------------------------------------ */
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900&display=swap');
-.wb { font-family: 'Archivo', system-ui, sans-serif; color:#1B1F24; background:#E9EBEE; -webkit-font-smoothing:antialiased; }
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+.wb { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color:#1B1F24; background:#E9EBEE; -webkit-font-smoothing:antialiased; }
 .wb * { box-sizing:border-box; }
-.wb .wide { font-stretch: 112%; }
-.wb .narrow { font-stretch: 88%; }
-.hazard { background: repeating-linear-gradient(135deg, #F2B600 0 10px, #1B1F24 10px 20px); }
+.wb .wide { letter-spacing: -0.02em; }
+.wb .narrow { letter-spacing: 0; }
+.teal { color:#0E494D; }
+.wb h1, .wb h2, .wb h3 { color:#0F2230; }
+.metric { color:#0A3655; }
+.active-fill { background:#0B4664 !important; color:#fff !important; }
+.sheet-in { animation: sheetin .32s cubic-bezier(.2,.8,.2,1) both; }
+.sheet-out { animation: sheetout .28s cubic-bezier(.4,0,1,1) both; }
+@keyframes sheetin { from { opacity:0; transform: translateY(28px) } to { opacity:1; transform: translateY(0) } }
+@keyframes sheetout { from { opacity:1; transform: translateY(0) } to { opacity:0; transform: translateY(40px) } }
+@media (prefers-reduced-motion: reduce) { .sheet-in, .sheet-out { animation-duration: .01s } }
+/* Splash */
+.splash { position:fixed; inset:0; z-index:60; background:#030B14; display:flex; align-items:center; justify-content:center; overflow:hidden; animation: splashout .5s ease-in 2.3s forwards; }
+.splash svg { width:min(96vw, 900px); overflow:visible; }
+.sp-word { fill:#F4F5F7; fill-opacity:0; stroke:#F4F5F7; stroke-width:1.6; stroke-dasharray:3000; stroke-dashoffset:3000;
+  animation: spdraw 1.3s cubic-bezier(.5,0,.3,1) .15s forwards, spfill .6s ease .8s forwards; }
+.sp-ghost { fill:none; stroke:#0B4664; stroke-width:2; opacity:0; animation: spfade .7s ease .05s forwards; }
+.sp-con { opacity:0; animation: spfade .5s ease forwards; }
+.sp-c1 { animation-delay:.5s } .sp-c2 { animation-delay:.7s } .sp-c3 { animation-delay:.9s } .sp-c4 { animation-delay:1.1s } .sp-c5 { animation-delay:1.3s }
+@keyframes spdraw { to { stroke-dashoffset:0 } }
+@keyframes spfill { to { fill-opacity:1 } }
+@keyframes spfade { to { opacity:1 } }
+@keyframes splashout { to { opacity:0; transform:scale(1.04) translateY(-10px); visibility:hidden } }
+@media (prefers-reduced-motion: reduce) {
+  .splash { animation: splashout .3s ease-in .6s forwards }
+  .sp-word { animation:none; stroke-dashoffset:0; fill-opacity:1 } .sp-ghost, .sp-con { animation:none; opacity:1 }
+}
+.wb.dark { background: linear-gradient(180deg, #0C2438 0%, #071A2C 45%, #030B14 100%); color:#F3F3EF; }
+.wb.dark h1, .wb.dark h2, .wb.dark h3, .wb.dark .text-white { color:#F3F3EF !important; }
+.wb.dark .bg-white { background-color:#F3F3EF !important; }
+.wb.dark .bg-white, .wb.dark .bg-white * { color:#1B1F24; }
+.wb.dark .bg-white .text-gray-500 { color:#6B7280; } .wb.dark .bg-white .text-gray-600 { color:#4B5563; } .wb.dark .bg-white .text-gray-400 { color:#9CA3AF; }
+.wb.dark .bg-white .teal { color:#0E494D; }
+.wb.dark .muted { color:#B5B9C0; }
+
+.lat, .lat-sweep { position:absolute; inset:0; pointer-events:none; background-repeat:repeat; background-size:32px 55.43px; }
+.lat { background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2255.43%22%20viewBox%3D%220%200%2032%2055.43%22%3E%3Cpath%20d%3D%22M0%200H32M0%2027.71H32M0%200L32%2055.43M32%200L0%2055.43%22%20fill%3D%22none%22%20stroke%3D%22%2317565A%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fsvg%3E"); opacity:.4; }
+.lat-sweep { background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2255.43%22%20viewBox%3D%220%200%2032%2055.43%22%3E%3Cpath%20d%3D%22M0%200H32M0%2027.71H32M0%200L32%2055.43M32%200L0%2055.43%22%20fill%3D%22none%22%20stroke%3D%22%230B4664%22%20stroke-width%3D%220.7%22%2F%3E%3C%2Fsvg%3E"); opacity:.8;
+  -webkit-mask-image: linear-gradient(135deg, transparent 0%, transparent 35%, #000 50%, transparent 65%, transparent 100%);
+  mask-image: linear-gradient(135deg, transparent 0%, transparent 35%, #000 50%, transparent 65%, transparent 100%);
+  -webkit-mask-size: 300% 300%; mask-size: 300% 300%;
+  animation: latsweep 7s ease-in-out infinite alternate; }
+@keyframes latsweep { from { -webkit-mask-position: 0% 0%; mask-position: 0% 0%; } to { -webkit-mask-position: 100% 100%; mask-position: 100% 100%; } }
+@media (prefers-reduced-motion: reduce) { .lat-sweep { animation:none; opacity:0 } }
+.hazard { background: repeating-linear-gradient(135deg, #F2B600 0 8px, #AE8700 8px 16px); }
 .plate { background:#1B1F24; color:#F4F5F7; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 1px 0 rgba(0,0,0,.4); }
 .plate .rivet { width:6px; height:6px; border-radius:50%; background:#8A8F98; box-shadow: inset 0 1px 1px rgba(0,0,0,.6); position:absolute; }
 .wb button:focus-visible, .wb input:focus-visible, .wb a:focus-visible { outline: 3px solid #1F4FD6; outline-offset: 2px; }
@@ -56,15 +98,45 @@ const VariantModal = ({ v, onPick }) => (
 
 const TIER = { oe: "OE · VW box", oem: "OEM · same part, maker's box", aftermarket: "Aftermarket" };
 
-const Dots = ({ c, dark }) => {
+
+/* "When to expect it": typical mileage/age range, earliest reported, what shortens it. Variant-aware via `only`. */
+const Lifespan = ({ l, choice }) => {
+  if (!l) return null;
+  const pick = arr => (Array.isArray(arr) ? arr.filter(x => vis(x, choice)).map(txt) : [arr]).filter(Boolean);
+  const heads = pick(l.headline), inspects = pick(l.inspect || []);
+  const C = "#936700";
+  return (
+    <section className="mt-4 rounded-sm bg-yellow-300/40 p-4" style={{ color: C }} aria-labelledby="lifespan-title">
+      <div className="flex gap-3">
+        <Hourglass size={34} strokeWidth={1.75} className="mt-0.5 shrink-0" aria-hidden />
+        <div className="min-w-0">
+          <div id="lifespan-title" className="text-xs font-bold uppercase tracking-wide opacity-80">{l.title || "When to expect it"}</div>
+          {heads.map((h, i) => <div key={i} className="wide font-black text-xl leading-tight mt-1" style={{ color: "#1B1300" }}>{h}</div>)}
+          {l.earliest ? <div className="mt-1 text-sm font-semibold" style={{ color: "#1B1300" }}>{l.earliest}</div> : null}
+          {l.detail ? <p className="mt-2 text-[15px] leading-relaxed" style={{ color: "#1B1300" }}>{l.detail}</p> : null}
+        </div>
+      </div>
+      {l.factors && l.factors.length ? (
+        <div className="mt-3">
+          <div className="text-xs font-bold opacity-80">Gets there sooner with</div>
+          <div className="mt-1 flex flex-wrap gap-1.5">{l.factors.map((f, i) => <span key={i} className="rounded-sm px-2 py-0.5 text-xs font-semibold" style={{ background: "rgba(147,103,0,0.14)", color: "#1B1300" }}>{f}</span>)}</div>
+        </div>
+      ) : null}
+      {inspects.length ? <div className="mt-3 flex items-center gap-2 text-[15px] font-bold" style={{ color: "#1B1300" }}><Clock size={16} aria-hidden />{inspects.join(" · ")}</div> : null}
+      {l.confidence ? <div className="mt-3 border-t pt-3" style={{ borderColor: "rgba(147,103,0,0.25)" }}><Dots c={l.confidence} tone={C} /></div> : null}
+    </section>
+  );
+};
+
+const Dots = ({ c, dark, tone }) => {
   const filled = c.level === "high" ? 3 : (c.level === "medium" || c.level === "community") ? 2 : 1;
   const label = { high: "High confidence", medium: "Medium confidence", community: "Community method", single: "Single source", varies: "Sources vary" }[c.level];
   return (
-    <div className={`flex items-start gap-2 text-sm ${dark ? "text-gray-300" : "text-gray-700"}`}>
-      <div className="flex gap-1 mt-1.5 shrink-0" aria-label={label}>
-        {[0,1,2].map(i => <span key={i} className={`block w-2 h-2 rounded-full ${i < filled ? (dark ? "bg-blue-400" : "bg-blue-700") : (dark ? "bg-gray-600" : "bg-gray-400")}`} />)}
+    <div className={`flex items-start gap-2 text-sm ${tone ? "" : dark ? "text-gray-300" : "text-gray-700"}`} style={tone ? { color: tone } : undefined}>
+      <div className="flex gap-0.5 mt-0.5 shrink-0" aria-label={label}>
+        {[0,1,2].map(i => <ThumbsUp key={i} size={15} strokeWidth={2} fill={i < filled ? (tone || "#3481A2") : "none"} style={{ color: i < filled ? (tone || "#3481A2") : (tone ? "rgba(147,103,0,0.35)" : dark ? "#6B7078" : "#B5B9C0") }} aria-hidden />)}
       </div>
-      <div><span className="font-semibold">{label}</span>{c.n ? <span className="text-gray-500"> · {c.n} source{c.n>1?"s":""}</span> : null}<span className="block text-gray-600 leading-snug">{c.note}</span></div>
+      <div><span className="font-semibold">{label}</span>{c.n ? <span className={tone ? "opacity-70" : "text-gray-500"}> · {c.n} source{c.n>1?"s":""}</span> : null}<span className={`block leading-snug ${tone ? "opacity-90" : "text-gray-600"}`}>{c.note}</span></div>
     </div>
   );
 };
@@ -103,189 +175,44 @@ const Torque = ({ b }) => {
   );
 };
 
-const INK = "#1B1F24", METAL = "#8A8F98", LIGHT = "#F4F5F7", COBALT = "#1F4FD6", TEAL = "#0E494D", PALE = "#C9ECEE", YEL = "#F2B600", BRASS = "#C89B3C", STEEL = "#B5B9C0";
-const Lbl = ({ x, y, children, anchor = "start", fill = INK, size = 12, w = 600 }) => <text x={x} y={y} textAnchor={anchor} fill={fill} fontSize={size} fontWeight={w} fontFamily="Archivo, system-ui, sans-serif">{children}</text>;
-const Leader = ({ d }) => <path d={d} fill="none" stroke={TEAL} strokeWidth="1.5" strokeDasharray="3 3" />;
-const Egg = ({ cx, cy, r, rot = 0, fill = "#4A4F58" }) => (
-  <g transform={`rotate(${rot} ${cx} ${cy})`}>
-    <path d={`M${cx} ${cy - r - 14} C ${cx + r * 0.75} ${cy - r - 14}, ${cx + r} ${cy - r * 0.45}, ${cx + r} ${cy} A ${r} ${r} 0 1 1 ${cx - r} ${cy} C ${cx - r} ${cy - r * 0.45}, ${cx - r * 0.75} ${cy - r - 14}, ${cx} ${cy - r - 14} Z`} fill={fill} stroke={INK} strokeWidth="2" />
-    <circle cx={cx} cy={cy} r={r * 0.2} fill={METAL} stroke={INK} strokeWidth="1.5" />
-  </g>
-);
-const Cup = ({ x, y, w = 70, h = 40 }) => <path d={`M${x} ${y} V${y + h} H${x + w} V${y}`} fill="none" stroke={INK} strokeWidth="6" strokeLinejoin="round" />;
-const Spring = ({ x, y, h, n = 5 }) => { const seg = h / n; let d = `M${x} ${y}`; for (let i = 0; i < n; i++) d += ` l10 ${seg / 2} l-20 ${seg / 2} l10 0`; return <path d={d} fill="none" stroke={INK} strokeWidth="2" />; };
-
-const ART = {
-  hero: (
-    <svg viewBox="0 0 400 260" className="w-full" role="img" aria-label="Cutaway showing the fuel pump piston pressing on the cup-shaped follower, which rides on the camshaft lobe">
-      <rect width="400" height="260" fill={LIGHT} />
-      <rect x="150" y="10" width="100" height="70" rx="6" fill={METAL} stroke={INK} strokeWidth="2" />
-      <Lbl x="200" y="52" anchor="middle" fill="#fff" size={14} w={800}>HPFP</Lbl>
-      <rect x="190" y="80" width="20" height="62" fill={STEEL} stroke={INK} strokeWidth="2" />
-      <Cup x={165} y={118} w={70} h={42} />
-      <Egg cx={200} cy={222} r={42} />
-      <ellipse cx="200" cy="164" rx="14" ry="4" fill={COBALT} />
-      <path d="M255 235 A 60 60 0 0 0 250 195" fill="none" stroke={TEAL} strokeWidth="2" markerEnd="url(#arr)" />
-      <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill={TEAL} /></marker></defs>
-      <Leader d="M212 110 H285" /><Lbl x="290" y="114">Pump piston</Lbl>
-      <Leader d="M238 140 H285" /><Lbl x="290" y="137">Cam follower</Lbl><Lbl x="290" y="151" size={11} w={400} fill={TEAL}>the sacrificial cup</Lbl>
-      <Leader d="M240 222 H285" /><Lbl x="290" y="226">Intake cam lobe</Lbl>
-      <Leader d="M186 164 H120" /><Lbl x="115" y="160" anchor="end" fill={COBALT} w={700}>Wear happens</Lbl><Lbl x="115" y="174" anchor="end" fill={COBALT} w={700}>right here</Lbl>
-    </svg>
-  ),
-  banjo: (
-    <svg viewBox="0 0 400 230" className="w-full" role="img" aria-label="Underside of the fuel pump showing the banjo bolt with a stubby triple-square bit and box wrench">
-      <rect width="400" height="230" fill={LIGHT} />
-      <rect x="120" y="8" width="120" height="70" rx="6" fill={METAL} stroke={INK} strokeWidth="2" />
-      <Lbl x="180" y="48" anchor="middle" fill="#fff" size={12} w={800}>HPFP · bottom</Lbl>
-      <rect x="240" y="30" width="160" height="10" fill={STEEL} stroke={INK} strokeWidth="1.5" />
-      <rect x="244" y="22" width="30" height="26" rx="3" fill={BRASS} stroke={INK} strokeWidth="1.5" />
-      <rect x="0" y="100" width="128" height="12" fill={STEEL} stroke={INK} strokeWidth="1.5" />
-      <circle cx="150" cy="106" r="20" fill={BRASS} stroke={INK} strokeWidth="2" />
-      <rect x="140" y="78" width="20" height="12" fill={BRASS} stroke={INK} strokeWidth="1.5" />
-      <circle cx="150" cy="106" r="8" fill={INK} />
-      <rect x="143" y="126" width="14" height="36" fill="#4A4F58" stroke={INK} strokeWidth="1.5" />
-      <rect x="143" y="132" width="14" height="10" fill={YEL} />
-      <rect x="150" y="150" width="150" height="16" rx="3" fill={METAL} stroke={INK} strokeWidth="2" />
-      <circle cx="150" cy="158" r="14" fill="none" stroke={INK} strokeWidth="6" />
-      <path d="M300 200 A 40 40 0 0 1 330 160" fill="none" stroke={TEAL} strokeWidth="2" markerEnd="url(#arr2)" />
-      <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill={TEAL} /></marker></defs>
-      <Lbl x="260" y="66" size={11} w={400} fill={TEAL}>17mm collar · step 5</Lbl>
-      <Leader d="M100 90 H60" /><Lbl x="55" y="86" anchor="end" size={11}>Low-pressure</Lbl><Lbl x="55" y="98" anchor="end" size={11}>metal line</Lbl>
-      <Leader d="M172 106 H215" /><Lbl x="220" y="102" size={11}>Banjo eye</Lbl><Lbl x="220" y="114" size={11} w={400} fill={TEAL}>bolt threads into brass</Lbl>
-      <Leader d="M136 137 H70" /><Lbl x="65" y="133" anchor="end" size={11}>Stubby M8</Lbl><Lbl x="65" y="145" anchor="end" size={11}>triple-square</Lbl>
-      <Leader d="M136 158 H70" /><Lbl x="65" y="162" anchor="end" size={11} fill={COBALT} w={700}>Tape on the bit</Lbl>
-      <Lbl x="225" y="190" anchor="middle" size={11}>13mm box wrench on the bit's shank</Lbl>
-      <Lbl x="340" y="215" anchor="middle" size={11} fill={TEAL} w={700}>slow, small turns</Lbl>
-    </svg>
-  ),
-  lobe: (
-    <svg viewBox="0 0 400 330" className="w-full" role="img" aria-label="Cam lobe on its flank makes the pump easy to seat; on its nose the spring is fully compressed. Below, tighten the three bolts alternately.">
-      <rect width="400" height="330" fill={LIGHT} />
-      <line x1="200" y1="14" x2="200" y2="200" stroke={METAL} strokeDasharray="4 4" />
-      <Lbl x="100" y="26" anchor="middle" fill={COBALT} size={14} w={800}>Lobe on the flank</Lbl>
-      <Lbl x="100" y="42" anchor="middle" fill={COBALT} size={11} w={400}>pump seats easily</Lbl>
-      <Spring x={100} y={60} h={50} />
-      <rect x="90" y="110" width="20" height="30" fill={STEEL} stroke={INK} strokeWidth="2" />
-      <Cup x={65} y={124} w={70} h={36} />
-      <Egg cx={100} cy={200} r={34} rot={-90} />
-      <Lbl x="300" y="26" anchor="middle" fill={INK} size={14} w={800}>Lobe on the nose</Lbl>
-      <rect x="240" y="32" width="120" height="14" fill={YEL} />
-      <Lbl x="300" y="43" anchor="middle" fill={INK} size={11} w={700}>spring fully compressed</Lbl>
-      <Spring x={300} y={60} h={22} n={5} />
-      <rect x="290" y="82" width="20" height="30" fill={STEEL} stroke={INK} strokeWidth="2" />
-      <Cup x={265} y={96} w={70} h={36} />
-      <Egg cx={300} cy={200} r={34} rot={0} />
-      <line x1="20" y1="222" x2="380" y2="222" stroke={METAL} />
-      <Lbl x="20" y="248" size={13} w={700}>Three bolts. Alternate, a little at a time.</Lbl>
-      <circle cx="90" cy="290" r="26" fill={METAL} stroke={INK} strokeWidth="2" />
-      <circle cx="90" cy="290" r="10" fill={INK} />
-      <circle cx="90" cy="266" r="6" fill={COBALT} /><Lbl x="90" y="269" anchor="middle" fill="#fff" size={9} w={800}>1</Lbl>
-      <circle cx="111" cy="302" r="6" fill={COBALT} /><Lbl x="111" y="305" anchor="middle" fill="#fff" size={9} w={800}>2</Lbl>
-      <circle cx="69" cy="302" r="6" fill={COBALT} /><Lbl x="69" y="305" anchor="middle" fill="#fff" size={9} w={800}>3</Lbl>
-      <Lbl x="135" y="286" size={12}>Snug 1 → 2 → 3, then go around again</Lbl>
-      <Lbl x="135" y="302" size={12}>Final torque: 10 Nm on each</Lbl>
-      <Lbl x="135" y="318" size={11} fill={TEAL} w={400}>Never fully tighten one bolt while the others are loose</Lbl>
-    </svg>
-  ),
-  wear: (
-    <svg viewBox="0 0 400 190" className="w-full" role="img" aria-label="Three followers face-on: intact coating, coating worn through in the center, and worn through with a hole">
-      <rect width="400" height="190" fill={LIGHT} />
-      {[[70, "A", "Coating intact"], [200, "B", "Silver in the center"], [330, "C", "Worn through"]].map(([x, l, t]) => (
-        <g key={l}>
-          <circle cx={x} cy="80" r="46" fill={INK} stroke="#000" strokeWidth="2" />
-          <path d={`M${x - 30} 58 A 38 38 0 0 1 ${x + 8} 38`} fill="none" stroke="#3A3F48" strokeWidth="4" strokeLinecap="round" />
-          <Lbl x={x} y="150" anchor="middle" size={20} w={900} fill={l === "C" ? COBALT : INK}>{l}</Lbl>
-          <Lbl x={x} y="170" anchor="middle" size={11} fill={TEAL}>{t}</Lbl>
-        </g>
-      ))}
-      <ellipse cx="200" cy="80" rx="22" ry="15" fill={STEEL} />
-      <ellipse cx="196" cy="77" rx="10" ry="5" fill="#E2E4E8" />
-      <ellipse cx="330" cy="82" rx="30" ry="22" fill={STEEL} />
-      <ellipse cx="330" cy="84" rx="16" ry="10" fill={LIGHT} stroke="#6B7078" strokeWidth="2" />
-      <path d="M312 66 L300 50 M348 70 L362 56 M334 104 L340 118" stroke="#6B7078" strokeWidth="2" />
-    </svg>
-  ),
-  bits: (
-    <svg viewBox="0 0 400 130" className="w-full" role="img" aria-label="A six-lobed Torx bit compared with a twelve-point triple-square bit">
-      <rect width="400" height="130" fill={LIGHT} />
-      <g transform="translate(100 56)">
-        <circle r="26" fill={INK} />
-        {[0, 60, 120, 180, 240, 300].map(a => <circle key={a} cx={24 * Math.cos(a * Math.PI / 180)} cy={24 * Math.sin(a * Math.PI / 180)} r="11" fill={INK} />)}
-        {[30, 90, 150, 210, 270, 330].map(a => <circle key={a} cx={30 * Math.cos(a * Math.PI / 180)} cy={30 * Math.sin(a * Math.PI / 180)} r="8" fill={LIGHT} />)}
-      </g>
-      <Lbl x="100" y="108" anchor="middle" size={13} w={800}>T30 Torx</Lbl>
-      <Lbl x="100" y="122" anchor="middle" size={11} fill={TEAL}>6 rounded lobes · pump bolts</Lbl>
-      <g transform="translate(300 56)">
-        {[0, 30, 60].map(a => <rect key={a} x="-26" y="-26" width="52" height="52" fill={INK} transform={`rotate(${a})`} />)}
-      </g>
-      <Lbl x="300" y="108" anchor="middle" size={13} w={800}>M8 triple-square (XZN)</Lbl>
-      <Lbl x="300" y="122" anchor="middle" size={11} fill={TEAL}>12 sharp points · banjo bolt</Lbl>
-      <Lbl x="200" y="60" anchor="middle" size={12} fill={COBALT} w={700}>not the same</Lbl>
-    </svg>
-  ),
-  rsbhero: (
-    <svg viewBox="0 0 400 240" className="w-full" role="img" aria-label="View from under the rear of the car: sway bar clamped to the subframe in two brackets, reaching each trailing arm through a short end link">
-      <rect width="400" height="240" fill={LIGHT} />
-      <rect x="60" y="40" width="280" height="40" rx="4" fill={METAL} stroke={INK} strokeWidth="2" />
-      <Lbl x="200" y="65" anchor="middle" fill="#fff" size={12} w={800}>Rear subframe</Lbl>
-      <rect x="30" y="60" width="26" height="120" rx="4" fill="#B5B9C0" stroke={INK} strokeWidth="2" />
-      <rect x="344" y="60" width="26" height="120" rx="4" fill="#B5B9C0" stroke={INK} strokeWidth="2" />
-      <Lbl x="43" y="200" anchor="middle" size={10}>Trailing arm</Lbl><Lbl x="357" y="200" anchor="middle" size={10}>Trailing arm</Lbl>
-      <path d="M70 150 L90 150 Q100 150 105 130 L110 100 L290 100 L295 130 Q300 150 310 150 L330 150" fill="none" stroke={COBALT} strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="130" y="84" width="34" height="32" rx="3" fill={INK} /><rect x="236" y="84" width="34" height="32" rx="3" fill={INK} />
-      <line x1="66" y1="150" x2="50" y2="110" stroke={INK} strokeWidth="6" strokeLinecap="round" /><line x1="334" y1="150" x2="350" y2="110" stroke={INK} strokeWidth="6" strokeLinecap="round" />
-      <Leader d="M147 122 V160" /><Lbl x="147" y="176" anchor="middle" size={11}>Bracket + bushing</Lbl><Lbl x="147" y="189" anchor="middle" size={10} fill={TEAL}>2 bolts, 10mm triple-square</Lbl>
-      <Leader d="M200 100 V60" /><Lbl x="200" y="30" anchor="middle" size={12} w={800} fill={COBALT}>Sway bar</Lbl>
-      <Leader d="M58 130 H100" /><Lbl x="104" y="127" size={11}>End link</Lbl><Lbl x="104" y="139" size={10} fill={TEAL}>16mm nut, 6mm stud</Lbl>
-      <Lbl x="200" y="225" anchor="middle" size={11} fill={TEAL}>Exhaust runs between the two brackets, which is why the bar has to rotate out</Lbl>
-    </svg>
-  ),
-  endlink: (
-    <svg viewBox="0 0 400 200" className="w-full" role="img" aria-label="End link stud held still with a small triple-square bit while a 16mm wrench turns the nut">
-      <rect width="400" height="200" fill={LIGHT} />
-      <rect x="150" y="20" width="100" height="26" rx="4" fill={COBALT} />
-      <Lbl x="200" y="38" anchor="middle" fill="#fff" size={11} w={800}>bar arm</Lbl>
-      <rect x="192" y="46" width="16" height="70" fill={STEEL} stroke={INK} strokeWidth="2" />
-      <path d="M180 70 h40 l6 10 l-6 10 h-40 l-6 -10 z" fill={METAL} stroke={INK} strokeWidth="2" />
-      <rect x="120" y="72" width="60" height="16" rx="3" fill={METAL} stroke={INK} strokeWidth="2" />
-      <Lbl x="150" y="60" anchor="middle" size={11} w={700}>16mm wrench</Lbl>
-      <path d="M100 120 A 40 40 0 0 0 130 100" fill="none" stroke={COBALT} strokeWidth="2.5" markerEnd="url(#arr3)" />
-      <Lbl x="80" y="140" size={11} fill={COBALT} w={700}>this turns</Lbl>
-      <rect x="196" y="116" width="8" height="40" fill="#4A4F58" stroke={INK} strokeWidth="1.5" />
-      <rect x="190" y="156" width="20" height="24" rx="3" fill={INK} />
-      <Lbl x="200" y="196" anchor="middle" size={10} fill="#fff">6mm</Lbl>
-      <Leader d="M212 150 H260" /><Lbl x="264" y="147" size={11} w={700}>6mm triple-square</Lbl><Lbl x="264" y="160" size={11} fill={TEAL}>held still, never turned</Lbl>
-      <Leader d="M226 80 H260" /><Lbl x="264" y="84" size={11}>end link stud + nut</Lbl>
-      <defs><marker id="arr3" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill={COBALT} /></marker></defs>
-    </svg>
-  ),
-  setting: (
-    <svg viewBox="0 0 400 190" className="w-full" role="img" aria-label="End of an adjustable sway bar with two holes: the forward hole gives a longer lever and softer rate, the rearward hole a shorter lever and stiffer rate">
-      <rect width="400" height="190" fill={LIGHT} />
-      <path d="M40 60 H200 L300 60" fill="none" stroke={COBALT} strokeWidth="14" strokeLinecap="round" />
-      <rect x="230" y="46" width="130" height="28" rx="6" fill={COBALT} />
-      <circle cx="270" cy="60" r="7" fill={LIGHT} stroke={INK} strokeWidth="2" /><circle cx="330" cy="60" r="7" fill={LIGHT} stroke={INK} strokeWidth="2" />
-      <line x1="130" y1="60" x2="130" y2="150" stroke={METAL} strokeDasharray="4 4" /><Lbl x="130" y="165" anchor="middle" size={10} fill={TEAL}>pivot (bushing)</Lbl>
-      <path d="M130 100 H330" fill="none" stroke={INK} strokeWidth="1.5" /><path d="M330 94 v12 M130 94 v12" stroke={INK} strokeWidth="1.5" />
-      <Lbl x="230" y="94" anchor="middle" size={11} w={700}>Forward hole · longer lever · softer</Lbl>
-      <Lbl x="230" y="114" anchor="middle" size={10} fill={TEAL}>Neuspeed 25mm: about 2× stock</Lbl>
-      <path d="M130 135 H270" fill="none" stroke={INK} strokeWidth="1.5" /><path d="M270 129 v12 M130 129 v12" stroke={INK} strokeWidth="1.5" />
-      <Lbl x="200" y="129" anchor="middle" size={11} w={700}>Rearward hole · shorter lever · stiffer</Lbl>
-      <Lbl x="200" y="150" anchor="middle" size={10} fill={TEAL}>about 2.5× stock</Lbl>
-      <Leader d="M270 67 V80" /><Leader d="M330 67 V80" />
-      <Lbl x="270" y="30" anchor="middle" size={11} w={800}>soft</Lbl><Lbl x="330" y="30" anchor="middle" size={11} w={800}>stiff</Lbl>
-      <Lbl x="360" y="180" anchor="end" size={10} fill={TEAL}>toward the rear of the car →</Lbl>
-    </svg>
-  ),
+/* Illustrations are SVG files in Supabase Storage (bucket: illustrations). Adding one = uploading a file, no redeploy. */
+const Lightbox = ({ src, cap, onClose }) => {
+  useEffect(() => {
+    const onKey = e => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow; document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [onClose]);
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "#2A2E34" }} role="dialog" aria-modal="true" aria-label={cap || "Illustration"} onClick={onClose}>
+      <div className="flex flex-1 items-center justify-center p-3 min-h-0">
+        <img src={src} alt={cap || ""} className="max-h-full max-w-full rounded-sm shadow-2xl" style={{ objectFit: "contain" }} onClick={e => e.stopPropagation()} />
+      </div>
+      <div className="shrink-0 px-6 pb-8 pt-2 text-center" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}>
+        {cap ? <p className="mx-auto mb-4 max-w-[560px] text-sm leading-relaxed" style={{ color: "#B5B9C0" }}>{cap}</p> : null}
+        <button onClick={onClose} aria-label="Close" className="mx-auto flex h-14 w-14 items-center justify-center rounded-full shadow-lg" style={{ background: "#5A5F68", color: "#E9EBEE" }}>
+          <X size={26} />
+        </button>
+        <p className="mt-2 text-xs" style={{ color: "#8A8F98" }}>Rotate your phone for a bigger view</p>
+      </div>
+    </div>
+  );
 };
 
-const Art = ({ id, cap }) => (
-  <figure className="my-4 overflow-hidden rounded-sm shadow-sm">
-    {ART[id] || <div className="p-4 text-sm text-gray-500">Illustration coming</div>}
-    {cap ? <figcaption className="bg-white px-3 py-2 text-sm text-gray-600">{cap}</figcaption> : null}
-  </figure>
-);
+const Art = ({ id, cap }) => {
+  const [open, setOpen] = useState(false);
+  const src = illustrationUrl(id);
+  return (
+    <figure className="my-4 overflow-hidden rounded-sm shadow-sm bg-[#F4F5F7]">
+      <button onClick={() => setOpen(true)} className="relative block w-full text-left" aria-label={`Open illustration full screen${cap ? ": " + cap : ""}`}>
+        <img src={src} alt={cap || ""} className="block w-full" loading="lazy" />
+        <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-sm bg-white/80 text-gray-700"><Maximize2 size={14} /></span>
+      </button>
+      {cap ? <figcaption className="bg-white px-3 py-2 text-sm text-gray-600">{cap}</figcaption> : null}
+      {open ? <Lightbox src={src} cap={cap} onClose={() => setOpen(false)} /> : null}
+    </figure>
+  );
+};
 
 const Video = ({ id, note, title }) => {
   const [on, setOn] = useState(false);
@@ -297,7 +224,7 @@ const Video = ({ id, note, title }) => {
         </div>
       ) : (
         <button onClick={() => setOn(true)} className="flex w-full items-center gap-3 p-3 text-left">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm bg-blue-700 text-white"><Play size={22} fill="currentColor" /></span>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm active-fill"><Play size={22} fill="currentColor" /></span>
           <span className="text-sm"><span className="block font-semibold">{title || "Watch it done"}</span><span className="text-gray-600">{note}</span></span>
         </button>
       )}
@@ -312,8 +239,8 @@ const Fork = ({ b, choice }) => {
       <div className="font-semibold mb-2">{b.q}</div>
       <div className="grid grid-cols-2 gap-2 mb-3">
         {b.v.map((v, k) => (
-          <button key={k} onClick={() => setI(k)} className={`rounded-sm px-3 py-2 text-left ${i===k ? "bg-blue-700 text-white" : "bg-gray-100 text-gray-800"}`}>
-            <div className="font-semibold text-sm">{v.label}</div><div className={`text-xs ${i===k?"text-blue-100":"text-gray-500"}`}>{v.when}</div>
+          <button key={k} onClick={() => setI(k)} className={`rounded-sm px-3 py-2 text-left ${i===k ? "active-fill" : "bg-gray-100 text-gray-800"}`}>
+            <div className="font-semibold text-sm">{v.label}</div><div className={`text-xs ${i===k?"text-white/75":"text-gray-500"}`}>{v.when}</div>
           </button>
         ))}
       </div>
@@ -338,16 +265,16 @@ const Block = ({ b, choice }) => {
 };
 
 const Step = ({ s, choice }) => (
-  <section id={`step-${s.n}`} className={`relative my-6 rounded-sm ${s.caution ? "bg-white shadow-md" : ""} ${s.caution ? "pl-6" : ""}`}>
-    {s.caution ? <div className="hazard absolute left-0 top-0 bottom-0 w-3 rounded-l-sm" aria-hidden /> : null}
+  <section id={`step-${s.n}`} className={`relative my-6 rounded-sm ${s.caution ? "bg-white shadow-md" : ""} ${s.caution ? "pl-3" : ""}`}>
+    {s.caution ? <div className="hazard absolute left-0 top-0 bottom-0 w-1.5 rounded-l-sm" aria-hidden /> : null}
     <div className={s.caution ? "p-4 pl-3" : ""}>
       {s.caution ? <div className="inline-block mb-2 rounded-sm bg-yellow-300 px-2 py-0.5 text-xs font-bold">Take your time here</div> : null}
       {s.timeSink ? <div className="inline-block mb-2 rounded-sm bg-gray-800 px-2 py-0.5 text-xs font-bold text-white">Where the hour goes</div> : null}
-      <div className="flex items-baseline gap-3">
-        <span className="wide font-black text-4xl leading-none text-gray-400 tabular-nums w-10 shrink-0">{s.n}</span>
-        <h3 className="font-bold text-xl leading-tight">{s.title}</h3>
+      <div className="flex items-center gap-4">
+        <span className="wide font-black text-4xl leading-none text-gray-400 tabular-nums w-12 shrink-0 text-right">{s.n}</span>
+        <h3 className="font-bold text-xl leading-tight" style={{ color: "#0B4664" }}>{s.title}</h3>
       </div>
-      <div className="pl-[52px]">{s.blocks.map((b, k) => <Block key={k} b={b} choice={choice} />)}</div>
+      <div className="pl-[64px]">{s.blocks.map((b, k) => <Block key={k} b={b} choice={choice} />)}</div>
     </div>
   </section>
 );
@@ -355,35 +282,117 @@ const Step = ({ s, choice }) => (
 /* ------------------------------------------------------------------ */
 /* SCREENS                                                             */
 /* ------------------------------------------------------------------ */
-const Frame = ({ children, onHome, crumbs, onBack }) => (
-  <div className="wb min-h-screen">
+
+/* Landing-page backdrop: an original technical drawing (piston, con-rod, crank throw) that plots itself in. */
+/* Landing-page backdrop: triangular lattice in dark teal with a lighter band that sweeps top-left to bottom-right and back. */
+const Lattice = () => (<><div className="lat" aria-hidden /><div className="lat-sweep" aria-hidden /></>);
+
+
+/* Loading screen: "Top Dead Center" plotted in like a blueprint, with construction lines, then fades to the landing page. */
+const Splash = ({ onDone }) => {
+  useEffect(() => {
+    const quick = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const t = setTimeout(onDone, quick ? 950 : 2850);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  const X0 = 60, W = 680, N = 15, step = W / N, base = 200, cap = 138;
+  const B = "#3481A2", B2 = "#4F9AA1";
+  return (
+    <div className="splash" role="status" aria-label="Loading Top Dead Center">
+      <svg viewBox="0 0 800 330" fontFamily="Plus Jakarta Sans, system-ui, sans-serif">
+        <text className="sp-ghost" x="400" y="300" textAnchor="middle" fontSize="215" fontWeight="800" textLength="1750" lengthAdjust="spacing">Top Dead Center</text>
+        {/* extension lines at letter boundaries */}
+        <g className="sp-con sp-c1" stroke={B} strokeWidth=".8" strokeDasharray="5 5" opacity="0">
+          {Array.from({ length: N + 1 }, (_, i) => <line key={i} x1={X0 + i * step} y1={cap - 60} x2={X0 + i * step} y2={base + 60} />)}
+        </g>
+        {/* dimension chain under the word */}
+        <g className="sp-con sp-c2" stroke={B} strokeWidth=".9" fill={B} opacity="0">
+          <line x1={X0} y1={base + 42} x2={X0 + W} y2={base + 42} />
+          <line x1={X0} y1={base + 34} x2={X0} y2={base + 50} /><line x1={X0 + W} y1={base + 34} x2={X0 + W} y2={base + 50} />
+          <path d={`M${X0} ${base + 42} l9 -3 v6 z M${X0 + W} ${base + 42} l-9 -3 v6 z`} stroke="none" />
+          <text x={X0 + W / 2} y={base + 62} textAnchor="middle" fontSize="11" stroke="none">680.00</text>
+          {Array.from({ length: N }, (_, i) => <text key={i} x={X0 + i * step + step / 2} y={base + 30} textAnchor="middle" fontSize="8" stroke="none" opacity=".8">{step.toFixed(0)}</text>)}
+        </g>
+        {/* height dimension */}
+        <g className="sp-con sp-c3" stroke={B} strokeWidth=".9" fill={B} opacity="0">
+          <line x1={X0 - 28} y1={cap} x2={X0 - 28} y2={base} />
+          <line x1={X0 - 36} y1={cap} x2={X0 - 8} y2={cap} /><line x1={X0 - 36} y1={base} x2={X0 - 8} y2={base} />
+          <path d={`M${X0 - 28} ${cap} l-3 9 h6 z M${X0 - 28} ${base} l-3 -9 h6 z`} stroke="none" />
+          <text x={X0 - 34} y={(cap + base) / 2} textAnchor="middle" fontSize="11" stroke="none" transform={`rotate(-90 ${X0 - 34} ${(cap + base) / 2})`}>62.00</text>
+          <line x1={X0 - 8} y1={cap + 22} x2={X0 + W + 20} y2={cap + 22} strokeDasharray="12 4 3 4" strokeWidth=".6" opacity=".7" />
+        </g>
+        {/* circles on the o's, angle arcs */}
+        <g className="sp-con sp-c4" stroke={B2} strokeWidth=".9" fill="none" opacity="0">
+          {[1.5, 11.5].map((k, i) => { const cx = X0 + k * step, cy = base - 24; return (
+            <g key={i}><circle cx={cx} cy={cy} r="28" /><circle cx={cx} cy={cy} r="19" strokeDasharray="3 4" />
+              <line x1={cx - 38} y1={cy} x2={cx + 38} y2={cy} strokeWidth=".6" /><line x1={cx} y1={cy - 38} x2={cx} y2={cy + 38} strokeWidth=".6" />
+              <circle cx={cx} cy={cy} r="1.8" fill={B2} stroke="none" /></g>); })}
+          <path d={`M${X0 + 8} ${base} A 40 40 0 0 1 ${X0 + 46} ${base - 14}`} strokeDasharray="3 3" />
+          <text x={X0 + 54} y={base - 18} fontSize="9" fill={B2} stroke="none">72°</text>
+          <path d={`M${X0 + 9.4 * step} ${base} A 34 34 0 0 0 ${X0 + 9.4 * step - 30} ${base - 16}`} strokeDasharray="3 3" />
+          <text x={X0 + 9.4 * step - 58} y={base - 22} fontSize="9" fill={B2} stroke="none">64°</text>
+        </g>
+        {/* title block */}
+        <g className="sp-con sp-c5" fill={B} opacity="0" fontSize="9">
+          <text x={X0} y="318">TOP DEAD CENTER · SHEET 1 OF 1</text>
+          <text x={X0 + W} y="318" textAnchor="end">DRAWN FROM EVERY SOURCE WE COULD FIND</text>
+        </g>
+        <text className="sp-word" x="400" y={base} textAnchor="middle" fontSize="80" fontWeight="800" textLength={W} lengthAdjust="spacing">Top Dead Center</text>
+      </svg>
+    </div>
+  );
+};
+
+const Frame = ({ children, onHome, crumbs, onBack, onClose, dark, anim }) => (
+  <div className={`wb relative min-h-screen ${dark ? "dark" : ""}`}>
     <style>{CSS}</style>
-    <div className="mx-auto max-w-[520px] min-h-screen bg-[#E9EBEE]">
-      <header className="sticky top-0 z-20 flex items-center gap-2 bg-[#E9EBEE]/95 px-4 py-3 backdrop-blur">
+    {dark ? <Lattice /> : null}
+    <div className={`relative mx-auto max-w-[520px] min-h-screen ${dark ? "" : "bg-[#E9EBEE]"} ${anim || ""}`}>
+      <header className={`sticky top-0 z-20 flex items-center gap-2 px-4 py-3 ${dark ? "" : "bg-[#E9EBEE]/95 backdrop-blur"}`} style={dark ? { background: "#051824", color: "#E6F8F8" } : undefined}>
         {onBack ? <button onClick={onBack} className="rounded-sm p-1 -ml-1" aria-label="Back"><ChevronLeft /></button> : null}
-        <button onClick={onHome} className="wide font-black text-lg tracking-tight">Wrenchbook</button>
+        <button onClick={onHome} className="wide font-black text-lg tracking-tight">Top Dead Center</button>
         {crumbs ? <div className="ml-auto truncate text-xs text-gray-500">{crumbs}</div> : null}
+        {onClose ? <button onClick={onClose} aria-label="Close" className="ml-auto -mr-1 flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-gray-700 shadow-sm"><X size={20} /></button> : null}
       </header>
-      <main className="px-4 pb-24">{children}</main>
+      <main className="relative px-4 pb-24">{children}</main>
     </div>
   </div>
 );
 
-const TaskCard = ({ t, onOpen }) => (
+const TaskCard = ({ t, onOpen, vehicle, compact }) => (
   <button onClick={() => t.live && onOpen(t)} disabled={!t.live} className={`w-full rounded-sm bg-white p-4 text-left shadow-sm ${t.live ? "" : "opacity-60"}`}>
     <div className="flex items-start justify-between gap-3">
       <div>
+        {vehicle ? <div className="mb-1 inline-block rounded-sm px-2 py-0.5 text-xs font-semibold teal" style={{ background: "rgba(14,73,77,0.08)" }}>{vehicle}</div> : null}
         <div className="text-xs text-gray-500">{t.cat}</div>
         <div className="font-bold text-lg leading-tight">{t.title}</div>
       </div>
       {t.live ? <ChevronRight className="shrink-0 text-blue-700" /> : <span className="shrink-0 rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Coming soon</span>}
     </div>
-    <div className="mt-2 flex gap-4 text-sm text-gray-600">
-      <span className="flex items-center gap-1"><Clock size={14} />{t.time}</span>
-      <span className="flex items-center gap-1"><Gauge size={14} />{t.diff}/5</span>
-    </div>
+    {compact ? null : (
+      <div className="mt-2 flex gap-4 text-sm text-gray-600">
+        <span className="flex items-center gap-1"><Clock size={14} />{t.time}</span>
+        <span className="flex items-center gap-1"><Gauge size={14} />{t.diff}/5</span>
+      </div>
+    )}
   </button>
 );
+
+/** Human label for the car(s) a task fits, derived from the catalog: "2006 Volkswagen GTI · 2.0T FSI". */
+const vehicleLabel = (db, powertrainId) => {
+  // powertrains is keyed "model-year"; fall back to the key when rows lack model_id/year
+  const rows = Object.entries(db.powertrains).flatMap(([key, list]) => list.map(p => {
+    const [mid, yr] = [key.slice(0, key.lastIndexOf("-")), key.slice(key.lastIndexOf("-") + 1)];
+    return { ...p, model_id: p.model_id || mid, year: p.year || Number(yr) };
+  })).filter(p => p.id === powertrainId);
+  if (!rows.length) return null;
+  const brandOf = mid => db.brands.find(b => (db.models[b.id] || []).some(m => m.id === mid));
+  const modelName = mid => Object.values(db.models).flat().find(m => m.id === mid)?.name || mid;
+  const first = rows[0];
+  const cars = [...new Set(rows.map(r => [r.year, brandOf(r.model_id)?.name, modelName(r.model_id)].filter(x => x !== undefined && x !== null && x !== "" && !Number.isNaN(x)).join(" ")))].filter(Boolean);
+  if (!cars.length) return first.name || null;
+  return `${cars[0]}${cars.length > 1 ? ` +${cars.length - 1} more` : ""} · ${first.name}`;
+};
 
 function HomeScreen({ go, db }) {
   const [q, setQ] = useState("");
@@ -392,25 +401,28 @@ function HomeScreen({ go, db }) {
     if (s.length < 2) return null;
     return db.tasks.filter(t => t.title.toLowerCase().includes(s) || t.aliases.some(a => a.includes(s)) || (t.group && t.group.includes(s)));
   }, [q]);
+  const [showAllRecent, setShowAllRecent] = useState(false);
+  const recent = db.tasks.filter(t => t.live);
+  const RECENT_MAX = 5;
   const groups = results ? [...new Set(results.map(r => r.group).filter(Boolean))] : [];
   const isDisambig = results && groups.length === 1 && results.every(r => r.group === groups[0]) && results.length > 1;
 
   return (
     <>
       <div className="pt-6 pb-4">
-        <h1 className="wide font-black text-[34px] leading-[1.02] tracking-tight">What are you fixing today?</h1>
-        <p className="mt-2 text-gray-600">Step-by-step guides built from every source we could find, checked against each other.</p>
+        <p className="text-[17px] leading-snug" style={{ color: "#75D3D8" }}>Step-by-step guides built from every source we could find, checked against each other.</p>
+        <h1 className="wide font-black text-[34px] leading-[1.02] tracking-tight mt-3">What are you fixing today?</h1>
       </div>
       <label className="flex items-center gap-2 rounded-sm bg-white px-3 py-3 shadow-sm">
         <Search size={20} className="text-gray-500" />
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Try “cam follower” or “sway bar”" className="w-full bg-transparent text-[17px] outline-none" />
       </label>
-      <div className="mt-1 text-xs text-gray-500">Searching guides for 2006 VW GTI 2.0T. Change car below.</div>
+      <div className="mt-1 text-xs muted">Searching guides for 2006 VW GTI 2.0T. Change car below.</div>
 
       {results ? (
         <div className="mt-5 space-y-3">
-          {isDisambig ? <div className="text-gray-700">Which <span className="font-semibold">{groups[0]}</span> do you mean?</div>
-            : <div className="text-gray-700">{results.length ? `${results.length} guide${results.length>1?"s":""}` : "Nothing yet for that. Try the part's common name or number."}</div>}
+          {isDisambig ? <div className="muted">Which <span className="font-semibold text-white">{groups[0]}</span> do you mean?</div>
+            : <div className="muted">{results.length ? `${results.length} guide${results.length>1?"s":""}` : "Nothing yet for that. Try the part's common name or number."}</div>}
           {results.map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.id })} />)}
         </div>
       ) : (
@@ -418,13 +430,23 @@ function HomeScreen({ go, db }) {
           <h2 className="mt-8 mb-3 font-bold text-lg">Browse by make</h2>
           <div className="grid grid-cols-2 gap-2">
             {db.brands.map(b => (
-              <button key={b.id} disabled={!b.live} onClick={() => go({ screen: "browse", brand: b })} className={`flex items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${b.live ? "" : "opacity-50"}`}>
-                <span className="font-bold text-[17px]">{b.name}</span>{b.live ? <ChevronRight size={18} className="text-blue-700" /> : null}
+              <button key={b.id} disabled={!b.live} onClick={() => go({ screen: "browse", brand: b })} className="flex items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm">
+                <span className={`font-bold text-[17px] ${b.live ? "" : "text-gray-400"}`}>{b.name}</span>{b.live ? <ChevronRight size={18} className="text-blue-700" /> : <span className="text-xs text-gray-400">Soon</span>}
               </button>
             ))}
           </div>
-          <h2 className="mt-8 mb-3 font-bold text-lg">Live now</h2><div className="space-y-2">
-          {db.tasks.filter(t => t.live).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.id })} />)}</div>
+          <h2 className="mt-8 mb-3 flex items-center gap-2 font-bold text-lg"><FileClock size={20} style={{ color: "#4F9AA1" }} aria-hidden />Recently added</h2><div className="space-y-2">
+          {(showAllRecent ? recent : recent.slice(0, RECENT_MAX)).map(t => <TaskCard key={t.id} t={t} vehicle={vehicleLabel(db, t.powertrainId)} compact onOpen={() => go({ screen: "guide", gid: t.id })} />)}
+          {recent.length > RECENT_MAX && !showAllRecent ? (
+            <button onClick={() => setShowAllRecent(true)} className="flex w-full items-center justify-center gap-1 rounded-sm bg-white px-4 py-3 text-sm font-semibold teal shadow-sm">View all {recent.length}<ChevronDown size={16} /></button>
+          ) : null}</div>
+          <section className="mt-12 mb-4 rounded-sm px-4 py-5 text-center" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="font-bold text-[17px]">Don't see what you need?</div>
+            <div className="mt-1 text-sm muted">Peer contribution is how we thrive.</div>
+            <button onClick={() => go({ screen: "request" })} className="mt-4 inline-flex items-center gap-2 rounded-sm px-4 py-2.5 text-sm font-semibold" style={{ background: "#4F9AA1", color: "#071A2C" }}>
+              <MessageSquarePlus size={18} />Request a guide
+            </button>
+          </section>
         </>
       )}
     </>
@@ -454,8 +476,17 @@ function Browse({ nav, go, back, db }) {
   );
 }
 
-function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
-  const g = db.guides[gid];
+function GuideScreen({ go, back, gid, db, choice: initialChoice, onChoice }) {
+  const [g, setG] = useState(null);
+  const [loadErr, setLoadErr] = useState(null);
+  useEffect(() => { let on = true; loadGuide(gid).then(x => on && setG(x)).catch(e => on && setLoadErr(e.message || String(e))); return () => { on = false; }; }, [gid]);
+  if (loadErr) return <Frame onHome={() => go({ screen: "home" })} onBack={back}><p className="pt-10 text-gray-700">Couldn't load this guide. {loadErr}</p></Frame>;
+  if (!g) return <Frame onHome={() => go({ screen: "home" })} onBack={back}><p className="pt-10 text-gray-500">Loading guide…</p></Frame>;
+  return <GuideBody go={go} back={back} g={g} initialChoice={initialChoice} onChoice={onChoice} />;
+}
+
+function GuideBody({ go, back, g, initialChoice, onChoice }) {
+  const gid = g.id;
   const v = g.variants;
   const [choice, setChoice] = useState(initialChoice || null);
   const [asking, setAsking] = useState(!!v && !initialChoice);
@@ -491,9 +522,9 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
   const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   const diffBar = Array.from({ length: 5 }, (_, i) => <span key={i} className={`h-2 w-5 rounded-sm ${i + 1 <= Math.floor(g.glance.difficulty) ? "bg-blue-700" : i < g.glance.difficulty ? "bg-blue-400" : "bg-gray-300"}`} />);
   const H2 = ({ id, children }) => <h2 id={id} className="wide font-black text-2xl tracking-tight pt-10 pb-3 scroll-mt-24">{children}</h2>;
-  const openKit = () => go({ screen: "kit", gid, choice });
+  const openKit = () => go({ screen: "kit", guide: g, choice });
   const Glance = ({ label, icon, children, onClick }) => {
-    const inner = <>{onClick ? <ChevronRight size={16} className="absolute right-2 top-2 text-blue-700" /> : null}<div className="flex items-center gap-1 text-xs text-gray-500">{icon}{label}</div>{children}</>;
+    const inner = <>{onClick ? <ChevronRight size={16} className="absolute right-2 top-2 metric" /> : null}<div className="flex items-center gap-1 text-xs text-gray-500">{icon}{label}</div>{children}</>;
     return onClick
       ? <button onClick={onClick} className="relative rounded-sm bg-white p-3 text-left shadow-sm">{inner}</button>
       : <div className="relative rounded-sm bg-white p-3 shadow-sm">{inner}</div>;
@@ -505,27 +536,28 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
         <div className="text-sm text-gray-500">{g.category} · {g.fits}</div>
         <h1 className="wide font-black text-[32px] leading-[1.02] tracking-tight mt-1">{g.title}</h1>
         {chosen ? (
-          <button onClick={() => setAsking(true)} className="mt-3 inline-flex items-center gap-2 rounded-sm bg-gray-900 px-3 py-1.5 text-sm font-semibold text-white">
+          <button onClick={() => setAsking(true)} className="mt-3 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm font-semibold text-white" style={{ background: "#0F2230" }}>
             <span>{chosen.label}</span><Repeat size={14} className="text-gray-300" /><span className="text-gray-300 font-normal">change</span>
           </button>
         ) : null}
       </div>
-      {asking && v ? <VariantModal v={v} onPick={id => { setChoice(id); setAsking(false); }} /> : null}
+      {asking && v ? <VariantModal v={v} onPick={id => { setChoice(id); setAsking(false); onChoice && onChoice(id); }} /> : null}
 
       <figure className="relative mt-5 mb-1 px-6">
-        <Quote size={64} strokeWidth={0} fill="#C9ECEE" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
+        <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
         <blockquote className="relative wide font-bold text-[21px] leading-snug" style={{ color: "#0E494D", zIndex: 1 }}>{g.glance.why}</blockquote>
-        <Quote size={64} strokeWidth={0} fill="#C9ECEE" className="absolute right-0 -bottom-4 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
+        <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute right-0 -bottom-4 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
       </figure>
 
       <nav className="sticky top-[52px] z-10 -mx-4 mt-5 flex gap-1 overflow-x-auto bg-[#E9EBEE]/95 px-4 py-2 backdrop-blur" aria-label="Contents" style={{ scrollbarWidth: "none" }}>
-        {nav.map(([id, l]) => <button key={id} ref={el => (tabRefs.current[id] = el)} onClick={() => jump(id)} aria-current={active===id ? "true" : undefined} className={`shrink-0 rounded-sm px-3 py-1.5 text-sm font-semibold transition-colors ${active===id ? "bg-gray-900 text-white" : "bg-white text-gray-700"}`}>{l}</button>)}
+        {nav.map(([id, l]) => <button key={id} ref={el => (tabRefs.current[id] = el)} onClick={() => jump(id)} aria-current={active===id ? "true" : undefined} className={`shrink-0 rounded-sm px-3 py-1.5 text-sm font-semibold transition-colors ${active===id ? "active-fill" : "bg-white text-gray-700"}`}>{l}</button>)}
       </nav>
 
-      <div id="glance" className="scroll-mt-28 mt-4 grid grid-cols-2 gap-2">
-        <Glance label="Time" icon={<Clock size={12} />}><div className="wide font-black text-2xl mt-1">{g.glance.timeFirst}</div><div className="text-xs text-gray-500">{g.glance.timeRepeat} once you've done it</div></Glance>
-        <Glance label="Difficulty" icon={<Gauge size={12} />}><div className="wide font-black text-2xl mt-1">{g.glance.difficulty}<span className="text-base text-gray-400">/5</span></div><div className="mt-1 flex gap-1">{diffBar}</div></Glance>
-        <Glance label="Parts" icon={<ShoppingCart size={12} />} onClick={openKit}><div className="wide font-black text-2xl mt-1">{g.glance.cost}</div><div className="text-xs text-blue-700 font-semibold">Parts, tools & where to buy</div></Glance>
+      <div id="glance" className="scroll-mt-28"><Lifespan l={g.lifespan} choice={choice} /></div>
+      <div className="mt-5 grid grid-cols-2 gap-2">
+        <Glance label="Time" icon={<Clock size={12} />}><div className="wide font-black text-2xl mt-1 metric">{g.glance.timeFirst}</div><div className="text-xs text-gray-500">{g.glance.timeRepeat} once you've done it</div></Glance>
+        <Glance label="Difficulty" icon={<Gauge size={12} />}><div className="wide font-black text-2xl mt-1 metric">{g.glance.difficulty}<span className="text-base text-gray-400">/5</span></div><div className="mt-1 flex gap-1">{diffBar}</div></Glance>
+        <Glance label="Parts" icon={<ShoppingCart size={12} />} onClick={openKit}><div className="wide font-black text-2xl mt-1 metric">{g.glance.cost}</div><div className="text-xs teal font-semibold">Parts, tools & where to buy</div></Glance>
         <Glance label="Watch out for"><div className="font-semibold mt-1 leading-snug">{g.glance.risk}</div></Glance>
       </div>
       <p className="mt-2 text-sm text-gray-600">{txt(g.glance.note)}</p>
@@ -534,19 +566,20 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
 
       <H2 id="should">Should you do this?</H2>
       <div className="font-semibold">Yes, if any of these are true</div>
-      <ul className="mt-2 space-y-1">{g.should.yesIf.filter(x => vis(x, choice)).map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-blue-700" />{txt(s)}</li>)}</ul>
+      <ul className="mt-2 space-y-1">{g.should.yesIf.filter(x => vis(x, choice)).map((s, i) => <li key={i} className="flex gap-2"><Check size={18} strokeWidth={3} className="mt-1 shrink-0" style={{ color: "#FF5A28" }} aria-hidden />{txt(s)}</li>)}</ul>
       {g.should.codes.length ? <div className="mt-3 flex flex-wrap gap-1">{g.should.codes.map(c => <span key={c} className="rounded-sm bg-gray-900 px-2 py-0.5 text-sm font-mono text-white">{c}</span>)}</div> : null}
       {g.should.notes.filter(x => vis(x, choice)).map((n, i) => <p key={i} className="mt-3 rounded-sm bg-white/70 px-3 py-2 text-[15px] leading-relaxed">{txt(n)}</p>)}
       <div className="mt-3"><Dots c={g.should.confidence} /></div>
 
       <H2 id="need">What you need</H2>
       <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div>{p.tier ? <div className="text-[11px] font-bold text-blue-700">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700"><div className="font-mono">{p.pn}</div><div className="text-gray-500">{p.price}</div></div></div>)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div>{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
       </div>
+      <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm px-4 py-3 text-left font-semibold text-white" style={{ background: "#0E494D" }}><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
       {g.aftermarket && g.aftermarket.length ? (
-        <div className="mt-2 rounded-sm bg-white shadow-sm">
+        <div className="mt-2 rounded-sm shadow-sm border-2" style={{ borderColor: "#E5FE52", background: "#F3FAE7" }}>
           <button onClick={() => setShowAM(x => !x)} aria-expanded={showAM} className="flex w-full items-center justify-between px-3 py-3 text-left">
-            <span className="font-semibold">Aftermarket options <span className="text-gray-500 font-normal">({g.aftermarket.length})</span></span>
+            <span className="flex items-center gap-2 font-semibold" style={{ color: "#212700" }}><span className="flex h-7 w-7 items-center justify-center rounded-sm" style={{ background: "#E5FE52" }}><Zap size={16} fill="#212700" style={{ color: "#212700" }} /></span>Aftermarket options <span className="font-normal opacity-60">({g.aftermarket.length})</span></span>
             <ChevronDown size={18} className={`text-gray-500 transition-transform ${showAM ? "rotate-180" : ""}`} />
           </button>
           {showAM ? (
@@ -557,7 +590,7 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
                     <div><div className="font-semibold">{a.name}</div><div className="text-sm text-gray-600">{a.note}</div></div>
                     <div className="shrink-0 text-sm text-gray-700">{a.price}</div>
                   </div>
-                  {a.signal ? <div className="mt-1 inline-flex items-center gap-1 rounded-sm bg-yellow-300/60 px-2 py-0.5 text-xs font-semibold"><Star size={12} />{a.signal}</div> : null}
+                  {a.signal ? <div className="mt-1 inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold" style={{ background: "#E5FE52", color: "#343D01" }}><Star size={12} />{a.signal}</div> : null}
                   {a.links && a.links.length ? <div className="mt-2 flex flex-wrap gap-2">{a.links.map((l, k) => <a key={k} href={l.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-sm bg-gray-900 px-2.5 py-1 text-sm font-semibold text-white">{l.store}<ExternalLink size={13} /></a>)}</div> : null}
                 </div>
               ))}
@@ -570,7 +603,6 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
         {g.tools.filter(x => vis(x, choice)).map((t, i) => <div key={i} className="flex gap-3 p-3"><Wrench size={18} className="mt-0.5 shrink-0 text-gray-500" /><div className="flex-1"><div className="font-semibold">{t.name}</div>{t.note ? <div className="text-sm text-gray-600">{t.note}</div> : null}</div><div className="shrink-0 text-sm text-gray-500">{t.price}</div></div>)}
       </div>
       {gid === "cam-follower" ? <Art id="bits" cap={'Both fit a ¼" drive. The forums are full of people who bought the wrong one.'} /> : null}
-      <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm bg-blue-700 px-4 py-3 text-left font-semibold text-white"><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
       <h3 className="mt-6 font-bold text-lg">Before you start</h3>
       <ul className="mt-2 space-y-2">{g.before.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{s}</li>)}</ul>
 
@@ -600,7 +632,7 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
           <div key={i} className="rounded-sm bg-white p-3 shadow-sm">
             <div className="font-bold">{d.topic}</div>
             <div className="mt-1 text-[15px] text-gray-600">{d.pos}</div>
-            <div className="mt-1 text-[15px]"><span className="font-semibold text-blue-700">Our call: </span>{d.call}</div>
+            <div className="mt-1 text-[15px]"><span className="font-semibold teal">Our call: </span>{d.call}</div>
           </div>
         ))}
       </div>
@@ -611,14 +643,13 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
   );
 }
 
-function KitScreen({ go, back, gid, db, choice }) {
-  const g = db.guides[gid];
+function KitScreen({ go, back, guide: g, choice }) {
   const [have, setHave] = useState({});
   const toggle = k => setHave(h => ({ ...h, [k]: !h[k] }));
   const Row = ({ k, name, note, pn, price, links }) => (
     <div className={`p-3 ${have[k] ? "opacity-50" : ""}`}>
       <div className="flex items-start gap-3">
-        <button onClick={() => toggle(k)} aria-pressed={!!have[k]} aria-label={have[k] ? "Mark as needed" : "Mark as already have"} className={`mt-0.5 h-6 w-6 shrink-0 rounded-sm border-2 ${have[k] ? "border-blue-700 bg-blue-700" : "border-gray-400 bg-white"}`}>{have[k] ? <span className="block text-center text-white text-sm leading-5">✓</span> : null}</button>
+        <button onClick={() => toggle(k)} aria-pressed={!!have[k]} aria-label={have[k] ? "Mark as needed" : "Mark as already have"} className={`mt-0.5 h-6 w-6 shrink-0 rounded-sm border-2 ${have[k] ? "active-fill border-transparent" : "border-gray-400 bg-white"}`}>{have[k] ? <span className="block text-center text-white text-sm leading-5">✓</span> : null}</button>
         <div className="flex-1 min-w-0">
           <div className="font-semibold leading-tight">{name}</div>
           {note ? <div className="text-sm text-gray-600">{note}</div> : null}
@@ -659,16 +690,85 @@ function KitScreen({ go, back, gid, db, choice }) {
   );
 }
 
+
+/* "Don't see what you need?" — request form. Saves to Supabase, forwards by email when configured. */
+function RequestScreen({ go, back }) {
+  const [closing, setClosing] = useState(false);
+  const close = () => { if (closing) return; setClosing(true); setTimeout(back, 280); };
+  const anim = closing ? "sheet-out" : "sheet-in";
+  const [f, setF] = useState({ name: "", email: "", year: "", make: "", model: "", description: "" });
+  const [state, setState] = useState("idle"); // idle | sending | done | error
+  const [errMsg, setErrMsg] = useState("");
+  const set = k => e => setF(x => ({ ...x, [k]: e.target.value }));
+  const valid = f.name.trim() && /\S+@\S+\.\S+/.test(f.email) && f.description.trim().length > 5;
+  const send = async () => {
+    if (!valid) return;
+    setState("sending");
+    try { await submitRequest(f); setState("done"); }
+    catch (e) { setErrMsg(e.message || String(e)); setState("error"); }
+  };
+  const Field = ({ k, label, placeholder, type = "text", area }) => (
+    <label className="block">
+      <span className="block text-sm font-semibold text-gray-700">{label}</span>
+      {area
+        ? <textarea value={f[k]} onChange={set(k)} placeholder={placeholder} rows={4} className="mt-1 w-full rounded-sm bg-white px-3 py-2.5 text-[17px] shadow-sm outline-none focus:ring-2 focus:ring-[#0B4664]" />
+        : <input value={f[k]} onChange={set(k)} placeholder={placeholder} type={type} className="mt-1 w-full rounded-sm bg-white px-3 py-2.5 text-[17px] shadow-sm outline-none focus:ring-2 focus:ring-[#0B4664]" />}
+    </label>
+  );
+  if (state === "done") return (
+    <Frame onHome={() => go({ screen: "home" })} onClose={close} anim={anim}>
+      <div className="pt-10">
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full active-fill"><Check size={26} /></div>
+        <h1 className="wide font-black text-3xl tracking-tight mt-4">Got it. Thank you.</h1>
+        <p className="mt-2 text-gray-600 leading-relaxed">Your request is in the queue. If we build it, you'll hear from us at {f.email}.</p>
+        <button onClick={() => go({ screen: "home" })} className="mt-6 rounded-sm px-4 py-3 font-semibold text-white" style={{ background: "#0E494D" }}>Back to home</button>
+      </div>
+    </Frame>
+  );
+  return (
+    <Frame onHome={() => go({ screen: "home" })} onClose={close} anim={anim}>
+      <div className="pt-4">
+        <div className="text-sm text-gray-500">Request a guide</div>
+        <h1 className="wide font-black text-3xl tracking-tight mt-1">What should we write next?</h1>
+        <p className="mt-2 text-gray-600 leading-relaxed">Tell us the car and the job. Peer contribution is how this thing grows.</p>
+      </div>
+      <div className="mt-6 space-y-4">
+        <Field k="name" label="Your name" placeholder="Anthony" />
+        <Field k="email" label="Email" placeholder="you@example.com" type="email" />
+        <div className="grid grid-cols-3 gap-3">
+          <Field k="year" label="Year" placeholder="2006" />
+          <Field k="make" label="Make" placeholder="Volkswagen" />
+          <Field k="model" label="Model" placeholder="GTI" />
+        </div>
+        <Field k="description" label="The guide you need" placeholder="How to replace the PCV valve on a 2.0T FSI" area />
+      </div>
+      {state === "error" ? <p className="mt-4 rounded-sm bg-yellow-300/40 px-3 py-2 text-sm">Couldn't send that. {errMsg}</p> : null}
+      <button onClick={send} disabled={!valid || state === "sending"} className={`mt-6 flex w-full items-center justify-center gap-2 rounded-sm px-4 py-3 font-semibold text-white ${valid ? "" : "opacity-50"}`} style={{ background: "#0E494D" }}>
+        <Send size={18} />{state === "sending" ? "Sending…" : "Send request"}
+      </button>
+      <p className="mt-3 text-xs text-gray-500">We use your email only to follow up about this request.</p>
+    </Frame>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 export default function App() {
   const [db, setDb] = useState(null);
   const [err, setErr] = useState(null);
+  const [splash, setSplash] = useState(true);
+  const endSplash = useCallback(() => setSplash(false), []);
   const [stack, setStack] = useState([{ screen: "home" }]);
   const nav = stack[stack.length - 1];
   const go = n => setStack(s => [...s, n]);
   const back = () => setStack(s => (s.length > 1 ? s.slice(0, -1) : s));
-  useEffect(() => { window.scrollTo(0, 0); }, [nav]);
-  useEffect(() => { loadAll().then(setDb).catch(e => setErr(e.message || String(e))); }, []);
+  const patch = p => setStack(s => [...s.slice(0, -1), { ...s[s.length - 1], ...p }]);
+  useEffect(() => { window.scrollTo(0, 0); }, [nav.screen, nav.gid]);
+  // Loads the vehicle catalog plus the task list for the current vehicle. Guides load one at a time when opened.
+  useEffect(() => {
+    Promise.all([loadCatalog(), loadTasks("bpy")])
+      .then(([cat, tasks]) => setDb({ ...cat, tasks }))
+      .catch(e => setErr(e.message || String(e)));
+  }, []);
 
   if (err) return (
     <Frame onHome={() => {}}>
@@ -680,17 +780,22 @@ export default function App() {
     </Frame>
   );
   if (!db) return (
-    <Frame onHome={() => {}}>
+    <Frame onHome={() => {}} dark>
+      {splash ? <Splash onDone={endSplash} /> : null}
       <div className="pt-10 text-gray-500">Loading guides…</div>
     </Frame>
   );
 
-  if (nav.screen === "guide") return <GuideScreen go={go} back={back} gid={nav.gid} db={db} choice={nav.choice} />;
-  if (nav.screen === "kit") return <KitScreen go={go} back={back} gid={nav.gid} db={db} choice={nav.choice} />;
+  if (nav.screen === "guide") return <GuideScreen go={go} back={back} gid={nav.gid} db={db} choice={nav.choice} onChoice={id => patch({ choice: id })} />;
+  if (nav.screen === "kit") return <KitScreen go={go} back={back} guide={nav.guide} choice={nav.choice} />;
   if (nav.screen === "browse") return <Browse nav={nav} go={go} back={back} db={db} />;
+  if (nav.screen === "request") return <RequestScreen go={go} back={back} />;
   return (
-    <Frame onHome={() => setStack([{ screen: "home" }])}>
-      <HomeScreen go={go} db={db} />
-    </Frame>
+    <>
+      {splash ? <Splash onDone={endSplash} /> : null}
+      <Frame onHome={() => setStack([{ screen: "home" }])} dark>
+        <HomeScreen go={go} db={db} />
+      </Frame>
+    </>
   );
 }

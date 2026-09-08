@@ -1,4 +1,4 @@
-# Wrenchbook
+# Top Dead Center
 
 DIY car repair guides, cross-checked across every source we can find. Proof of concept: 2006 VW GTI 2.0T.
 
@@ -21,7 +21,7 @@ Open the URL Vite prints. The app loads its content from Supabase, so the SQL st
 ```bash
 git init
 git add .
-git commit -m "Wrenchbook v0.1: two guides, Supabase-backed"
+git commit -m "Top Dead Center v0.1: two guides, Supabase-backed"
 git branch -M main
 git remote add origin git@github.com:xpxhxoxexnxixx/wrenchbook.git
 git push -u origin main
@@ -40,8 +40,18 @@ Vercel auto-detects Vite. If a deploy ran before the variables existed, trigger 
 Open the Vercel URL in Safari or Chrome → Share → **Add to Home Screen**. It installs as a standalone app.
 
 ## Adding a guide
-Guides are JSON in the `guides` table (see `schema.md` in the design docs for the shape). New guides arrive as a
-SQL file you run the same way as step 1. Illustrations live in `src/App.jsx` under `ART`, keyed by id.
+Guides are JSON in the `guides` table (see `schema.md` for the shape). New guides arrive as a SQL file you run the
+same way as step 1. No redeploy needed; the app fetches each guide when it's opened.
+
+## Adding an illustration
+Illustrations are `.svg` files in the Supabase Storage bucket `illustrations` (created by `supabase/003_illustrations_bucket.sql`).
+Upload `<id>.svg` on the Storage page and reference it from a guide block as `{ "t": "ill", "id": "<id>", "cap": "..." }`.
+No redeploy needed. The originals for the current guides are in `illustrations/`.
+
+## Sharing guides across models
+Tasks attach to an engine (`tasks.powertrain_id`, e.g. `bpy`), not a model. Adding a row to `powertrains` for
+another car with the same engine (Jetta 2006 · bpy) makes every BPY guide appear for it. Model-specific differences
+go in the guide as `only:` tagged blocks or a `fork`.
 
 ## Layout
 ```
