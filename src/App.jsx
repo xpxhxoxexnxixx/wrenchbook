@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { loadAll } from "./lib/data";
-import { Search, ChevronRight, ChevronLeft, Clock, Wrench, Gauge, ShieldAlert, Play, Quote, ExternalLink, ShoppingCart } from "lucide-react";
+import { Search, ChevronRight, ChevronLeft, Clock, Wrench, Gauge, ShieldAlert, Play, Quote, ExternalLink, ShoppingCart, ChevronDown, Star, Repeat } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /* DATA — this is the shape the content pipeline produces (see schema) */
@@ -29,6 +29,33 @@ const CSS = `
 /* ------------------------------------------------------------------ */
 /* SMALL PARTS                                                         */
 /* ------------------------------------------------------------------ */
+
+/* Variant visibility: any item may carry `only: ["optionId", ...]`. Items without `only` show for everyone. */
+const vis = (item, choice) => !item || !item.only || !choice || item.only.includes(choice);
+const txt = item => (typeof item === "string" ? item : item.text);
+
+const VariantModal = ({ v, onPick }) => (
+  <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-labelledby="variant-q">
+    <div className="absolute inset-0 bg-white/40 backdrop-blur-xl" />
+    <div className="relative m-3 w-full max-w-[480px] rounded-md bg-white p-5 shadow-2xl">
+      <div className="text-xs text-gray-500">Before you start</div>
+      <h2 id="variant-q" className="wide font-black text-2xl leading-tight mt-1">{v.question}</h2>
+      {v.hint ? <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">{v.hint}</p> : null}
+      <div className="mt-4 grid gap-2">
+        {v.options.map(o => (
+          <button key={o.id} onClick={() => onPick(o.id)} className="rounded-sm border-2 border-gray-200 bg-white px-4 py-3 text-left hover:border-blue-700 focus-visible:border-blue-700">
+            <div className="font-bold text-[17px]">{o.label}</div>
+            {o.when ? <div className="text-sm text-gray-600 mt-0.5">{o.when}</div> : null}
+          </button>
+        ))}
+      </div>
+      <p className="mt-3 text-xs text-gray-500">You can change this any time from the top of the guide.</p>
+    </div>
+  </div>
+);
+
+const TIER = { oe: "OE · VW box", oem: "OEM · same part, maker's box", aftermarket: "Aftermarket" };
+
 const Dots = ({ c, dark }) => {
   const filled = c.level === "high" ? 3 : (c.level === "medium" || c.level === "community") ? 2 : 1;
   const label = { high: "High confidence", medium: "Medium confidence", community: "Community method", single: "Single source", varies: "Sources vary" }[c.level];
@@ -278,7 +305,7 @@ const Video = ({ id, note, title }) => {
   );
 };
 
-const Fork = ({ b }) => {
+const Fork = ({ b, choice }) => {
   const [i, setI] = useState(0);
   return (
     <div className="my-4 rounded-sm bg-white p-3 shadow-sm">
@@ -290,12 +317,13 @@ const Fork = ({ b }) => {
           </button>
         ))}
       </div>
-      {b.v[i].blocks.map((bb, k) => <Block key={k} b={bb} />)}
+      {b.v[i].blocks.filter(x => vis(x, choice)).map((bb, k) => <Block key={k} b={bb} choice={choice} />)}
     </div>
   );
 };
 
-const Block = ({ b }) => {
+const Block = ({ b, choice }) => {
+  if (!vis(b, choice)) return null;
   switch (b.t) {
     case "text": return <p className="my-3 leading-relaxed text-[17px]">{b.b}</p>;
     case "note": return <p className="my-3 rounded-sm bg-white/70 px-3 py-2 text-[15px] text-gray-700 leading-relaxed">{b.b}</p>;
@@ -303,13 +331,13 @@ const Block = ({ b }) => {
     case "torque": return <Torque b={b} />;
     case "ill": return <Art id={b.id} cap={b.cap} />;
     case "embed": return <Video id={b.id} note={b.note} title={b.title} />;
-    case "fork": return <Fork b={b} />;
+    case "fork": return <Fork b={b} choice={choice} />;
     case "conf": return <div className="my-3"><Dots c={b.c} /></div>;
     default: return null;
   }
 };
 
-const Step = ({ s }) => (
+const Step = ({ s, choice }) => (
   <section id={`step-${s.n}`} className={`relative my-6 rounded-sm ${s.caution ? "bg-white shadow-md" : ""} ${s.caution ? "pl-6" : ""}`}>
     {s.caution ? <div className="hazard absolute left-0 top-0 bottom-0 w-3 rounded-l-sm" aria-hidden /> : null}
     <div className={s.caution ? "p-4 pl-3" : ""}>
@@ -319,7 +347,7 @@ const Step = ({ s }) => (
         <span className="wide font-black text-4xl leading-none text-gray-400 tabular-nums w-10 shrink-0">{s.n}</span>
         <h3 className="font-bold text-xl leading-tight">{s.title}</h3>
       </div>
-      <div className="pl-[52px]">{s.blocks.map((b, k) => <Block key={k} b={b} />)}</div>
+      <div className="pl-[52px]">{s.blocks.map((b, k) => <Block key={k} b={b} choice={choice} />)}</div>
     </div>
   </section>
 );
@@ -426,8 +454,13 @@ function Browse({ nav, go, back, db }) {
   );
 }
 
-function GuideScreen({ go, back, gid, db }) {
+function GuideScreen({ go, back, gid, db, choice: initialChoice }) {
   const g = db.guides[gid];
+  const v = g.variants;
+  const [choice, setChoice] = useState(initialChoice || null);
+  const [asking, setAsking] = useState(!!v && !initialChoice);
+  const [showAM, setShowAM] = useState(false);
+  const chosen = v && choice ? v.options.find(o => o.id === choice) : null;
   const [active, setActive] = useState("glance");
   const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],["steps","Steps"],["read", g.check.tab],["after","After"],["sources","Sources"]];
   const tabRefs = useRef({});
@@ -458,7 +491,7 @@ function GuideScreen({ go, back, gid, db }) {
   const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   const diffBar = Array.from({ length: 5 }, (_, i) => <span key={i} className={`h-2 w-5 rounded-sm ${i + 1 <= Math.floor(g.glance.difficulty) ? "bg-blue-700" : i < g.glance.difficulty ? "bg-blue-400" : "bg-gray-300"}`} />);
   const H2 = ({ id, children }) => <h2 id={id} className="wide font-black text-2xl tracking-tight pt-10 pb-3 scroll-mt-24">{children}</h2>;
-  const openKit = () => go({ screen: "kit", gid });
+  const openKit = () => go({ screen: "kit", gid, choice });
   const Glance = ({ label, icon, children, onClick }) => {
     const inner = <>{onClick ? <ChevronRight size={16} className="absolute right-2 top-2 text-blue-700" /> : null}<div className="flex items-center gap-1 text-xs text-gray-500">{icon}{label}</div>{children}</>;
     return onClick
@@ -471,7 +504,13 @@ function GuideScreen({ go, back, gid, db }) {
       <div className="pt-4">
         <div className="text-sm text-gray-500">{g.category} · {g.fits}</div>
         <h1 className="wide font-black text-[32px] leading-[1.02] tracking-tight mt-1">{g.title}</h1>
+        {chosen ? (
+          <button onClick={() => setAsking(true)} className="mt-3 inline-flex items-center gap-2 rounded-sm bg-gray-900 px-3 py-1.5 text-sm font-semibold text-white">
+            <span>{chosen.label}</span><Repeat size={14} className="text-gray-300" /><span className="text-gray-300 font-normal">change</span>
+          </button>
+        ) : null}
       </div>
+      {asking && v ? <VariantModal v={v} onPick={id => { setChoice(id); setAsking(false); }} /> : null}
 
       <figure className="relative mt-5 mb-1 px-6">
         <Quote size={64} strokeWidth={0} fill="#C9ECEE" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
@@ -489,23 +528,46 @@ function GuideScreen({ go, back, gid, db }) {
         <Glance label="Parts" icon={<ShoppingCart size={12} />} onClick={openKit}><div className="wide font-black text-2xl mt-1">{g.glance.cost}</div><div className="text-xs text-blue-700 font-semibold">Parts, tools & where to buy</div></Glance>
         <Glance label="Watch out for"><div className="font-semibold mt-1 leading-snug">{g.glance.risk}</div></Glance>
       </div>
-      <p className="mt-2 text-sm text-gray-600">{g.glance.note}</p>
+      <p className="mt-2 text-sm text-gray-600">{txt(g.glance.note)}</p>
       <Art id={g.kind === "upgrade" ? "rsbhero" : "hero"} cap={g.heroCap} />
       <Video id={g.embeds[0].id} title="Watch the whole job" note={g.embeds[0].note} />
 
       <H2 id="should">Should you do this?</H2>
       <div className="font-semibold">Yes, if any of these are true</div>
-      <ul className="mt-2 space-y-1">{g.should.yesIf.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-blue-700" />{s}</li>)}</ul>
+      <ul className="mt-2 space-y-1">{g.should.yesIf.filter(x => vis(x, choice)).map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-blue-700" />{txt(s)}</li>)}</ul>
       {g.should.codes.length ? <div className="mt-3 flex flex-wrap gap-1">{g.should.codes.map(c => <span key={c} className="rounded-sm bg-gray-900 px-2 py-0.5 text-sm font-mono text-white">{c}</span>)}</div> : null}
-      {g.should.notes.map((n, i) => <p key={i} className="mt-3 rounded-sm bg-white/70 px-3 py-2 text-[15px] leading-relaxed">{n}</p>)}
+      {g.should.notes.filter(x => vis(x, choice)).map((n, i) => <p key={i} className="mt-3 rounded-sm bg-white/70 px-3 py-2 text-[15px] leading-relaxed">{txt(n)}</p>)}
       <div className="mt-3"><Dots c={g.should.confidence} /></div>
 
       <H2 id="need">What you need</H2>
       <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div><div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700"><div className="font-mono">{p.pn}</div><div className="text-gray-500">{p.price}</div></div></div>)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div>{p.tier ? <div className="text-[11px] font-bold text-blue-700">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700"><div className="font-mono">{p.pn}</div><div className="text-gray-500">{p.price}</div></div></div>)}
       </div>
+      {g.aftermarket && g.aftermarket.length ? (
+        <div className="mt-2 rounded-sm bg-white shadow-sm">
+          <button onClick={() => setShowAM(x => !x)} aria-expanded={showAM} className="flex w-full items-center justify-between px-3 py-3 text-left">
+            <span className="font-semibold">Aftermarket options <span className="text-gray-500 font-normal">({g.aftermarket.length})</span></span>
+            <ChevronDown size={18} className={`text-gray-500 transition-transform ${showAM ? "rotate-180" : ""}`} />
+          </button>
+          {showAM ? (
+            <div className="divide-y divide-gray-200 border-t border-gray-200">
+              {g.aftermarket.map((a, i) => (
+                <div key={i} className="p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div><div className="font-semibold">{a.name}</div><div className="text-sm text-gray-600">{a.note}</div></div>
+                    <div className="shrink-0 text-sm text-gray-700">{a.price}</div>
+                  </div>
+                  {a.signal ? <div className="mt-1 inline-flex items-center gap-1 rounded-sm bg-yellow-300/60 px-2 py-0.5 text-xs font-semibold"><Star size={12} />{a.signal}</div> : null}
+                  {a.links && a.links.length ? <div className="mt-2 flex flex-wrap gap-2">{a.links.map((l, k) => <a key={k} href={l.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-sm bg-gray-900 px-2.5 py-1 text-sm font-semibold text-white">{l.store}<ExternalLink size={13} /></a>)}</div> : null}
+                </div>
+              ))}
+              <p className="p-3 text-xs text-gray-500">Ratings from retail and forum sources will appear here once the review pipeline is live.</p>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <div className="mt-3 rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.tools.map((t, i) => <div key={i} className="flex gap-3 p-3"><Wrench size={18} className="mt-0.5 shrink-0 text-gray-500" /><div className="flex-1"><div className="font-semibold">{t.name}</div>{t.note ? <div className="text-sm text-gray-600">{t.note}</div> : null}</div><div className="shrink-0 text-sm text-gray-500">{t.price}</div></div>)}
+        {g.tools.filter(x => vis(x, choice)).map((t, i) => <div key={i} className="flex gap-3 p-3"><Wrench size={18} className="mt-0.5 shrink-0 text-gray-500" /><div className="flex-1"><div className="font-semibold">{t.name}</div>{t.note ? <div className="text-sm text-gray-600">{t.note}</div> : null}</div><div className="shrink-0 text-sm text-gray-500">{t.price}</div></div>)}
       </div>
       {gid === "cam-follower" ? <Art id="bits" cap={'Both fit a ¼" drive. The forums are full of people who bought the wrong one.'} /> : null}
       <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm bg-blue-700 px-4 py-3 text-left font-semibold text-white"><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
@@ -513,7 +575,7 @@ function GuideScreen({ go, back, gid, db }) {
       <ul className="mt-2 space-y-2">{g.before.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{s}</li>)}</ul>
 
       <H2 id="steps">Steps</H2>
-      {g.steps.map(s => <Step key={s.n} s={s} />)}
+      {g.steps.filter(x => vis(x, choice)).map(s => <Step key={s.n} s={s} choice={choice} />)}
 
       <H2 id="read">{g.check.title}</H2>
       <Art id={g.check.illId} cap={g.check.illCap} />
@@ -529,7 +591,7 @@ function GuideScreen({ go, back, gid, db }) {
       <div className="mt-3"><Dots c={g.check.c} /></div>
 
       <H2 id="after">Afterwards</H2>
-      <ul className="space-y-2">{g.aftercare.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{s}</li>)}</ul>
+      <ul className="space-y-2">{g.aftercare.filter(x => vis(x, choice)).map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{txt(s)}</li>)}</ul>
       {gid === "cam-follower" ? <div className="mt-3"><Dots c={C.interval} /></div> : null}
 
       <H2 id="sources">Where sources disagree</H2>
@@ -549,7 +611,7 @@ function GuideScreen({ go, back, gid, db }) {
   );
 }
 
-function KitScreen({ go, back, gid, db }) {
+function KitScreen({ go, back, gid, db, choice }) {
   const g = db.guides[gid];
   const [have, setHave] = useState({});
   const toggle = k => setHave(h => ({ ...h, [k]: !h[k] }));
@@ -580,11 +642,17 @@ function KitScreen({ go, back, gid, db }) {
       </div>
       <h2 className="mt-6 mb-2 font-bold text-lg">Parts</h2>
       <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.map((p, i) => <Row key={i} k={`p${i}`} name={p.name} note={p.note} pn={p.pn} price={p.price} links={p.links} />)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <Row key={i} k={`p${i}`} name={p.name} note={(p.tier ? (TIER[p.tier] || p.tier) + " · " : "") + (p.note || "")} pn={p.pn} price={p.price} links={p.links} />)}
       </div>
+      {g.aftermarket && g.aftermarket.length ? (<>
+        <h2 className="mt-6 mb-2 font-bold text-lg">Aftermarket options</h2>
+        <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
+          {g.aftermarket.map((a, i) => <Row key={i} k={`a${i}`} name={a.name} note={(a.signal ? a.signal + " · " : "") + (a.note || "")} price={a.price} links={a.links} />)}
+        </div>
+      </>) : null}
       <h2 className="mt-6 mb-2 font-bold text-lg">Tools</h2>
       <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.tools.map((t, i) => <Row key={i} k={`t${i}`} name={t.name} note={t.note} price={t.price} />)}
+        {g.tools.filter(x => vis(x, choice)).map((t, i) => <Row key={i} k={`t${i}`} name={t.name} note={t.note} price={t.price} />)}
       </div>
       <p className="mt-3 text-sm text-gray-500">Tool links arrive once we've picked retail partners. Part links go to the retailers whose guides we drew from.</p>
     </Frame>
@@ -617,8 +685,8 @@ export default function App() {
     </Frame>
   );
 
-  if (nav.screen === "guide") return <GuideScreen go={go} back={back} gid={nav.gid} db={db} />;
-  if (nav.screen === "kit") return <KitScreen go={go} back={back} gid={nav.gid} db={db} />;
+  if (nav.screen === "guide") return <GuideScreen go={go} back={back} gid={nav.gid} db={db} choice={nav.choice} />;
+  if (nav.screen === "kit") return <KitScreen go={go} back={back} gid={nav.gid} db={db} choice={nav.choice} />;
   if (nav.screen === "browse") return <Browse nav={nav} go={go} back={back} db={db} />;
   return (
     <Frame onHome={() => setStack([{ screen: "home" }])}>
