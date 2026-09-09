@@ -4,8 +4,8 @@
   "description": "DIY car repair guides, cross-checked across every source we can find.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#E9EBEE",
-  "theme_color": "#E9EBEE",
+  "background_color": "#FDFDFC",
+  "theme_color": "#FDFDFC",
   "icons": [
     {
       "src": "/icon-192.png",

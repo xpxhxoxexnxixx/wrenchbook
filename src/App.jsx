@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { loadCatalog, loadTasks, loadGuide, illustrationUrl, submitRequest } from "./lib/data";
-import { Search, ChevronRight, ChevronLeft, Clock, Wrench, Gauge, ShieldAlert, Play, Quote, ExternalLink, ShoppingCart, ChevronDown, Star, Repeat, Zap, X, Maximize2, Check, ThumbsUp, Hourglass, FileClock, MessageSquarePlus, Send } from "lucide-react";
+import { Search, ChevronRight, ChevronLeft, Clock, Wrench, Gauge, ShieldAlert, Play, Quote, ExternalLink, ShoppingCart, ChevronDown, Star, Repeat, Zap, X, Maximize2, Check, ThumbsUp, Hourglass, FileClock, MessageSquarePlus, Send, PlusCircle, Lightbulb, CalendarCheck } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /* DATA — this is the shape the content pipeline produces (see schema) */
@@ -14,7 +14,7 @@ const C = { interval: { level: "community", n: 4, note: "No factory interval exi
 /* ------------------------------------------------------------------ */
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-.wb { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color:#1B1F24; background:#E9EBEE; -webkit-font-smoothing:antialiased; }
+.wb { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color:#1B1F24; background:#FDFDFC; -webkit-font-smoothing:antialiased; }
 .wb * { box-sizing:border-box; }
 .wb .wide { letter-spacing: -0.02em; }
 .wb .narrow { letter-spacing: 0; }
@@ -22,6 +22,7 @@ const CSS = `
 .wb h1, .wb h2, .wb h3 { color:#0F2230; }
 .metric { color:#0A3655; }
 .active-fill { background:#0B4664 !important; color:#fff !important; }
+.wb:not(.dark) .card { background-color:#F9F9F5; }
 .sheet-in { animation: sheetin .32s cubic-bezier(.2,.8,.2,1) both; }
 .sheet-out { animation: sheetout .28s cubic-bezier(.4,0,1,1) both; }
 @keyframes sheetin { from { opacity:0; transform: translateY(28px) } to { opacity:1; transform: translateY(0) } }
@@ -61,7 +62,7 @@ const CSS = `
 @keyframes latsweep { from { -webkit-mask-position: 0% 0%; mask-position: 0% 0%; } to { -webkit-mask-position: 100% 100%; mask-position: 100% 100%; } }
 @media (prefers-reduced-motion: reduce) { .lat-sweep { animation:none; opacity:0 } }
 .hazard { background: repeating-linear-gradient(135deg, #F2B600 0 8px, #AE8700 8px 16px); }
-.plate { background:#1B1F24; color:#F4F5F7; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 1px 0 rgba(0,0,0,.4); }
+.plate { background:#20313C; color:#F4F5F7; }
 .plate .rivet { width:6px; height:6px; border-radius:50%; background:#8A8F98; box-shadow: inset 0 1px 1px rgba(0,0,0,.6); position:absolute; }
 .wb button:focus-visible, .wb input:focus-visible, .wb a:focus-visible { outline: 3px solid #1F4FD6; outline-offset: 2px; }
 .flip { transition: transform .35s; transform-style: preserve-3d; }
@@ -79,13 +80,13 @@ const txt = item => (typeof item === "string" ? item : item.text);
 const VariantModal = ({ v, onPick }) => (
   <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-labelledby="variant-q">
     <div className="absolute inset-0 bg-white/40 backdrop-blur-xl" />
-    <div className="relative m-3 w-full max-w-[480px] rounded-md bg-white p-5 shadow-2xl">
+    <div className="relative m-3 w-full max-w-[480px] rounded-md p-5 shadow-2xl" style={{ background: "#FDFDFC" }}>
       <div className="text-xs text-gray-500">Before you start</div>
       <h2 id="variant-q" className="wide font-black text-2xl leading-tight mt-1">{v.question}</h2>
       {v.hint ? <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">{v.hint}</p> : null}
       <div className="mt-4 grid gap-2">
         {v.options.map(o => (
-          <button key={o.id} onClick={() => onPick(o.id)} className="rounded-sm border-2 border-gray-200 bg-white px-4 py-3 text-left hover:border-blue-700 focus-visible:border-blue-700">
+          <button key={o.id} onClick={() => onPick(o.id)} className="rounded-sm border-2 border-gray-200 px-4 py-3 text-left hover:border-[#0B4664] focus-visible:border-[#0B4664]" style={{ background: "#F9F9F5" }}>
             <div className="font-bold text-[17px]">{o.label}</div>
             {o.when ? <div className="text-sm text-gray-600 mt-0.5">{o.when}</div> : null}
           </button>
@@ -107,14 +108,14 @@ const Lifespan = ({ l, choice }) => {
   const C = "#936700";
   return (
     <section className="mt-4 rounded-sm bg-yellow-300/40 p-4" style={{ color: C }} aria-labelledby="lifespan-title">
-      <div className="flex gap-3">
-        <Hourglass size={34} strokeWidth={1.75} className="mt-0.5 shrink-0" aria-hidden />
-        <div className="min-w-0">
-          <div id="lifespan-title" className="text-xs font-bold uppercase tracking-wide opacity-80">{l.title || "When to expect it"}</div>
-          {heads.map((h, i) => <div key={i} className="wide font-black text-xl leading-tight mt-1" style={{ color: "#1B1300" }}>{h}</div>)}
-          {l.earliest ? <div className="mt-1 text-sm font-semibold" style={{ color: "#1B1300" }}>{l.earliest}</div> : null}
-          {l.detail ? <p className="mt-2 text-[15px] leading-relaxed" style={{ color: "#1B1300" }}>{l.detail}</p> : null}
-        </div>
+      <div className="flex items-center gap-3">
+        <Hourglass size={30} strokeWidth={1.75} className="shrink-0" aria-hidden />
+        <div id="lifespan-title" className="text-xs font-bold uppercase tracking-wide opacity-80">{l.title || "When to expect it"}</div>
+      </div>
+      <div className="mt-3">
+        {heads.map((h, i) => <div key={i} className="wide font-black text-xl leading-tight" style={{ color: "#1B1300" }}>{h}</div>)}
+        {l.earliest ? <div className="mt-1 text-sm font-semibold" style={{ color: "#1B1300" }}>{l.earliest}</div> : null}
+        {l.detail ? <p className="mt-2 text-[15px] leading-relaxed" style={{ color: "#1B1300" }}>{l.detail}</p> : null}
       </div>
       {l.factors && l.factors.length ? (
         <div className="mt-3">
@@ -128,15 +129,15 @@ const Lifespan = ({ l, choice }) => {
   );
 };
 
-const Dots = ({ c, dark, tone }) => {
+const Dots = ({ c, dark, tone, text }) => {
   const filled = c.level === "high" ? 3 : (c.level === "medium" || c.level === "community") ? 2 : 1;
   const label = { high: "High confidence", medium: "Medium confidence", community: "Community method", single: "Single source", varies: "Sources vary" }[c.level];
   return (
-    <div className={`flex items-start gap-2 text-sm ${tone ? "" : dark ? "text-gray-300" : "text-gray-700"}`} style={tone ? { color: tone } : undefined}>
+    <div className={`flex items-start gap-2 text-sm ${tone || text ? "" : dark ? "text-gray-300" : "text-gray-700"}`} style={tone ? { color: tone } : text ? { color: text } : undefined}>
       <div className="flex gap-0.5 mt-0.5 shrink-0" aria-label={label}>
         {[0,1,2].map(i => <ThumbsUp key={i} size={15} strokeWidth={2} fill={i < filled ? (tone || "#3481A2") : "none"} style={{ color: i < filled ? (tone || "#3481A2") : (tone ? "rgba(147,103,0,0.35)" : dark ? "#6B7078" : "#B5B9C0") }} aria-hidden />)}
       </div>
-      <div><span className="font-semibold">{label}</span>{c.n ? <span className={tone ? "opacity-70" : "text-gray-500"}> · {c.n} source{c.n>1?"s":""}</span> : null}<span className={`block leading-snug ${tone ? "opacity-90" : "text-gray-600"}`}>{c.note}</span></div>
+      <div><span className="font-semibold">{label}</span>{c.n ? <span className={tone || text ? "opacity-70" : "text-gray-500"}> · {c.n} source{c.n>1?"s":""}</span> : null}<span className={`block leading-snug ${tone || text ? "opacity-90" : "text-gray-600"}`}>{c.note}</span></div>
     </div>
   );
 };
@@ -152,12 +153,12 @@ const Torque = ({ b }) => {
       <span className="rivet" style={{top:8,left:8}} /><span className="rivet" style={{top:8,right:8}} /><span className="rivet" style={{bottom:8,left:8}} /><span className="rivet" style={{bottom:8,right:8}} />
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-xs text-gray-400 narrow">Torque · {b.label}</div>
+          <div className="text-xs narrow" style={{ color: "#F1FAFF" }}>Torque · {b.label}</div>
           <button onClick={() => setUnit(u => u === "nm" ? "lb" : "nm")} className="text-left mt-1 flex items-baseline gap-2" aria-label="Toggle units">
             <span className="wide font-black text-5xl leading-none tabular-nums" style={{ letterSpacing: "-0.02em" }}>{range}</span>
-            <span className="text-lg text-gray-300 font-semibold">{unit === "nm" ? "Nm" : "lb-ft"}{b.note ? <span className="ml-2 text-yellow-300">{b.note}</span> : null}</span>
+            <span className="text-lg font-semibold" style={{ color: "#F1FAFF" }}>{unit === "nm" ? "Nm" : "lb-ft"}{b.note ? <span className="ml-2 text-yellow-300">{b.note}</span> : null}</span>
           </button>
-          <div className="text-xs text-gray-400 mt-1">
+          <div className="text-xs mt-1" style={{ color: "#F1FAFF" }}>
             {unit === "nm"
               ? `${vals.length > 1 ? lb(Math.min(...vals)) + "–" + lb(Math.max(...vals)) : lb(b.nm)} lb-ft`
               : `${vals.length > 1 ? Math.min(...vals) + "–" + Math.max(...vals) : b.nm} Nm`} · tap to switch
@@ -166,11 +167,11 @@ const Torque = ({ b }) => {
         <Wrench className="shrink-0 text-gray-500" size={40} strokeWidth={1.5} />
       </div>
       {b.alt ? (
-        <div className="mt-3 rounded-sm bg-gray-800 px-3 py-2 text-sm text-gray-200">
+        <div className="mt-3 rounded-sm bg-black/25 px-3 py-2 text-sm" style={{ color: "#F1FAFF" }}>
           <span className="font-semibold">Two values in the wild:</span> {vals.map(v => `${v} Nm`).join(" and ")}. No factory number found.
         </div>
       ) : null}
-      <div className="mt-3 border-t border-gray-700 pt-3"><Dots c={b.c} dark /></div>
+      <div className="mt-3 border-t border-white/15 pt-3"><Dots c={b.c} dark text="#F1FAFF" /></div>
     </div>
   );
 };
@@ -190,7 +191,7 @@ const Lightbox = ({ src, cap, onClose }) => {
       </div>
       <div className="shrink-0 px-6 pb-8 pt-2 text-center" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}>
         {cap ? <p className="mx-auto mb-4 max-w-[560px] text-sm leading-relaxed" style={{ color: "#B5B9C0" }}>{cap}</p> : null}
-        <button onClick={onClose} aria-label="Close" className="mx-auto flex h-14 w-14 items-center justify-center rounded-full shadow-lg" style={{ background: "#5A5F68", color: "#E9EBEE" }}>
+        <button onClick={onClose} aria-label="Close" className="mx-auto flex h-14 w-14 items-center justify-center rounded-full shadow-lg" style={{ background: "#5A5F68", color: "#FDFDFC" }}>
           <X size={26} />
         </button>
         <p className="mt-2 text-xs" style={{ color: "#8A8F98" }}>Rotate your phone for a bigger view</p>
@@ -203,12 +204,12 @@ const Art = ({ id, cap }) => {
   const [open, setOpen] = useState(false);
   const src = illustrationUrl(id);
   return (
-    <figure className="my-4 overflow-hidden rounded-sm shadow-sm bg-[#F4F5F7]">
+    <figure className="my-4 overflow-hidden rounded-sm shadow-sm bg-[#F9F9F5]">
       <button onClick={() => setOpen(true)} className="relative block w-full text-left" aria-label={`Open illustration full screen${cap ? ": " + cap : ""}`}>
         <img src={src} alt={cap || ""} className="block w-full" loading="lazy" />
         <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-sm bg-white/80 text-gray-700"><Maximize2 size={14} /></span>
       </button>
-      {cap ? <figcaption className="bg-white px-3 py-2 text-sm text-gray-600">{cap}</figcaption> : null}
+      {cap ? <figcaption className="card bg-white px-3 py-2 text-sm text-gray-600">{cap}</figcaption> : null}
       {open ? <Lightbox src={src} cap={cap} onClose={() => setOpen(false)} /> : null}
     </figure>
   );
@@ -217,7 +218,7 @@ const Art = ({ id, cap }) => {
 const Video = ({ id, note, title }) => {
   const [on, setOn] = useState(false);
   return (
-    <div className="my-4 overflow-hidden rounded-sm bg-white shadow-sm">
+    <div className="card my-4 overflow-hidden rounded-sm bg-white shadow-sm">
       {on ? (
         <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
           <iframe className="absolute inset-0 h-full w-full" src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`} title={title || "Video"} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
@@ -235,11 +236,11 @@ const Video = ({ id, note, title }) => {
 const Fork = ({ b, choice }) => {
   const [i, setI] = useState(0);
   return (
-    <div className="my-4 rounded-sm bg-white p-3 shadow-sm">
+    <div className="my-4">
       <div className="font-semibold mb-2">{b.q}</div>
       <div className="grid grid-cols-2 gap-2 mb-3">
         {b.v.map((v, k) => (
-          <button key={k} onClick={() => setI(k)} className={`rounded-sm px-3 py-2 text-left ${i===k ? "active-fill" : "bg-gray-100 text-gray-800"}`}>
+          <button key={k} onClick={() => setI(k)} className={`rounded-sm px-3 py-2 text-left border border-gray-200 ${i===k ? "active-fill border-transparent" : "bg-white text-gray-800"}`}>
             <div className="font-semibold text-sm">{v.label}</div><div className={`text-xs ${i===k?"text-white/75":"text-gray-500"}`}>{v.when}</div>
           </button>
         ))}
@@ -265,16 +266,16 @@ const Block = ({ b, choice }) => {
 };
 
 const Step = ({ s, choice }) => (
-  <section id={`step-${s.n}`} className={`relative my-6 rounded-sm ${s.caution ? "bg-white shadow-md" : ""} ${s.caution ? "pl-3" : ""}`}>
+  <section id={`step-${s.n}`} className={`relative my-7 ${s.caution ? "card rounded-sm bg-white shadow-md" : ""}`}>
     {s.caution ? <div className="hazard absolute left-0 top-0 bottom-0 w-1.5 rounded-l-sm" aria-hidden /> : null}
-    <div className={s.caution ? "p-4 pl-3" : ""}>
+    <div className={s.caution ? "py-4 pl-4 pr-3" : ""}>
       {s.caution ? <div className="inline-block mb-2 rounded-sm bg-yellow-300 px-2 py-0.5 text-xs font-bold">Take your time here</div> : null}
       {s.timeSink ? <div className="inline-block mb-2 rounded-sm bg-gray-800 px-2 py-0.5 text-xs font-bold text-white">Where the hour goes</div> : null}
-      <div className="flex items-center gap-4">
-        <span className="wide font-black text-4xl leading-none text-gray-400 tabular-nums w-12 shrink-0 text-right">{s.n}</span>
+      <div className="flex items-center gap-3">
+        <span className="wide font-black text-4xl leading-none tabular-nums shrink-0" style={{ color: "#B7B7B4" }}>{s.n}</span>
         <h3 className="font-bold text-xl leading-tight" style={{ color: "#0B4664" }}>{s.title}</h3>
       </div>
-      <div className="pl-[64px]">{s.blocks.map((b, k) => <Block key={k} b={b} choice={choice} />)}</div>
+      <div className="mt-1">{s.blocks.map((b, k) => <Block key={k} b={b} choice={choice} />)}</div>
     </div>
   </section>
 );
@@ -292,8 +293,11 @@ const Lattice = () => (<><div className="lat" aria-hidden /><div className="lat-
 const Splash = ({ onDone }) => {
   useEffect(() => {
     const quick = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const t = setTimeout(onDone, quick ? 950 : 2850);
-    return () => clearTimeout(t);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.scrollTo(0, 0);
+    const t = setTimeout(() => { document.body.style.overflow = prev; window.scrollTo(0, 0); onDone(); }, quick ? 950 : 2850);
+    return () => { clearTimeout(t); document.body.style.overflow = prev; };
   }, [onDone]);
   const X0 = 60, W = 680, N = 15, step = W / N, base = 200, cap = 138;
   const B = "#3481A2", B2 = "#4F9AA1";
@@ -347,8 +351,8 @@ const Frame = ({ children, onHome, crumbs, onBack, onClose, dark, anim }) => (
   <div className={`wb relative min-h-screen ${dark ? "dark" : ""}`}>
     <style>{CSS}</style>
     {dark ? <Lattice /> : null}
-    <div className={`relative mx-auto max-w-[520px] min-h-screen ${dark ? "" : "bg-[#E9EBEE]"} ${anim || ""}`}>
-      <header className={`sticky top-0 z-20 flex items-center gap-2 px-4 py-3 ${dark ? "" : "bg-[#E9EBEE]/95 backdrop-blur"}`} style={dark ? { background: "#051824", color: "#E6F8F8" } : undefined}>
+    <div className={`relative mx-auto max-w-[520px] min-h-screen ${dark ? "" : "bg-[#FDFDFC]"} ${anim || ""}`}>
+      <header className={`sticky top-0 z-20 flex items-center gap-2 px-4 py-3 ${dark ? "" : "bg-[#FDFDFC]/95 backdrop-blur"}`} style={dark ? { background: "#051824", color: "#E6F8F8" } : undefined}>
         {onBack ? <button onClick={onBack} className="rounded-sm p-1 -ml-1" aria-label="Back"><ChevronLeft /></button> : null}
         <button onClick={onHome} className="wide font-black text-lg tracking-tight">Top Dead Center</button>
         {crumbs ? <div className="ml-auto truncate text-xs text-gray-500">{crumbs}</div> : null}
@@ -359,12 +363,12 @@ const Frame = ({ children, onHome, crumbs, onBack, onClose, dark, anim }) => (
   </div>
 );
 
-const TaskCard = ({ t, onOpen, vehicle, compact }) => (
-  <button onClick={() => t.live && onOpen(t)} disabled={!t.live} className={`w-full rounded-sm bg-white p-4 text-left shadow-sm ${t.live ? "" : "opacity-60"}`}>
+const TaskCard = ({ t, onOpen, vehicle, compact, tag }) => (
+  <button onClick={() => t.live && onOpen(t)} disabled={!t.live} className={`card w-full rounded-sm bg-white p-4 text-left shadow-sm ${t.live ? "" : "opacity-60"}`}>
     <div className="flex items-start justify-between gap-3">
       <div>
         {vehicle ? <div className="mb-1 inline-block rounded-sm px-2 py-0.5 text-xs font-semibold teal" style={{ background: "rgba(14,73,77,0.08)" }}>{vehicle}</div> : null}
-        <div className="text-xs text-gray-500">{t.cat}</div>
+        <div className="text-xs text-gray-500">{t.cat}{tag ? <span className="ml-2 rounded-sm px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide" style={{ background: "#E5FE52", color: "#343D01" }}>{tag}</span> : null}</div>
         <div className="font-bold text-lg leading-tight">{t.title}</div>
       </div>
       {t.live ? <ChevronRight className="shrink-0 text-blue-700" /> : <span className="shrink-0 rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Coming soon</span>}
@@ -379,31 +383,54 @@ const TaskCard = ({ t, onOpen, vehicle, compact }) => (
 );
 
 /** Human label for the car(s) a task fits, derived from the catalog: "2006 Volkswagen GTI · 2.0T FSI". */
-const vehicleLabel = (db, powertrainId) => {
-  // powertrains is keyed "model-year"; fall back to the key when rows lack model_id/year
-  const rows = Object.entries(db.powertrains).flatMap(([key, list]) => list.map(p => {
-    const [mid, yr] = [key.slice(0, key.lastIndexOf("-")), key.slice(key.lastIndexOf("-") + 1)];
-    return { ...p, model_id: p.model_id || mid, year: p.year || Number(yr) };
-  })).filter(p => p.id === powertrainId);
+const vehicleLabel = (db, powertrainId, engineOverride) => {
+  const rows = Object.entries(db.powertrains).flatMap(([genId, list]) => list.filter(p => p.id === powertrainId).map(p => ({ ...p, genId })));
   if (!rows.length) return null;
-  const brandOf = mid => db.brands.find(b => (db.models[b.id] || []).some(m => m.id === mid));
+  const allGens = Object.entries(db.gens).flatMap(([mid, gs]) => gs.map(g => ({ ...g, model_id: mid })));
   const modelName = mid => Object.values(db.models).flat().find(m => m.id === mid)?.name || mid;
-  const first = rows[0];
-  const cars = [...new Set(rows.map(r => [r.year, brandOf(r.model_id)?.name, modelName(r.model_id)].filter(x => x !== undefined && x !== null && x !== "" && !Number.isNaN(x)).join(" ")))].filter(Boolean);
-  if (!cars.length) return first.name || null;
-  return `${cars[0]}${cars.length > 1 ? ` +${cars.length - 1} more` : ""} · ${first.name}`;
+  const brandOf = mid => db.brands.find(b => (db.models[b.id] || []).some(m => m.id === mid));
+  const cars = [...new Set(rows.map(r => {
+    const g = allGens.find(x => x.id === r.genId);
+    if (!g) return null;
+    return [`${g.from}–${g.to || "present"}`, brandOf(g.model_id)?.name, modelName(g.model_id)].filter(Boolean).join(" ");
+  }).filter(Boolean))];
+  if (!cars.length) return rows[0].name || null;
+  const engine = engineOverride ? engineOverride.replace(/ only$/, "") : allEngines(db, powertrainId);
+  return `${cars[0]}${cars.length > 1 ? ` +${cars.length - 1} more` : ""} · ${engine}`;
 };
+
+/** Engine name(s) a guide applies to within its generation, e.g. "FSI" · "TSI" · null when it covers every engine listed. */
+const engineTag = (db, task) => {
+  const siblings = db.tasks.filter(t => (t.guideId || t.id) === (task.guideId || task.id));
+  const allPts = Object.values(db.powertrains).flat();
+  const gen = allPts.find(p => p.id === task.powertrainId)?.generation_id;
+  const genPts = allPts.filter(p => p.generation_id === gen);
+  const covered = new Set(siblings.map(t => t.powertrainId));
+  if (genPts.length <= 1 || genPts.every(p => covered.has(p.id))) return null;
+  return genPts.filter(p => covered.has(p.id)).map(shortEngine).join(" / ") + " only";
+};
+/** "2.0T FSI" → "FSI", "3.2 VR6 (R32)" → "R32" */
+const shortEngine = p => { const m = p.name.match(/\(([^)]+)\)/); return m ? m[1] : p.name.replace(/^[\d.]+T?\s*/, ""); };
+const allEngines = (db, powertrainId) => {
+  const allPts = Object.values(db.powertrains).flat();
+  const gen = allPts.find(p => p.id === powertrainId)?.generation_id;
+  const names = allPts.filter(p => p.generation_id === gen).map(shortEngine);
+  return names.length > 1 ? names.slice(0, -1).join(", ") + " & " + names[names.length - 1] : names[0] || "";
+};
+const dedupeByGuide = tasks => { const seen = new Set(); return tasks.filter(t => { const g = t.guideId || t.id; if (seen.has(g)) return false; seen.add(g); return true; }); };
 
 function HomeScreen({ go, db }) {
   const [q, setQ] = useState("");
   const results = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (s.length < 2) return null;
-    return db.tasks.filter(t => t.title.toLowerCase().includes(s) || t.aliases.some(a => a.includes(s)) || (t.group && t.group.includes(s)));
+    return dedupeByGuide(db.tasks.filter(t => t.title.toLowerCase().includes(s) || t.aliases.some(a => a.includes(s)) || (t.group && t.group.includes(s))));
   }, [q]);
   const [showAllRecent, setShowAllRecent] = useState(false);
-  const recent = db.tasks.filter(t => t.live);
-  const RECENT_MAX = 5;
+  const RECENT_DAYS = 14, RECENT_MAX = 5;
+  const cutoff = Date.now() - RECENT_DAYS * 86400000;
+  const recent = dedupeByGuide(db.tasks.filter(t => t.live && t.createdAt && new Date(t.createdAt).getTime() >= cutoff))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const groups = results ? [...new Set(results.map(r => r.group).filter(Boolean))] : [];
   const isDisambig = results && groups.length === 1 && results.every(r => r.group === groups[0]) && results.length > 1;
 
@@ -415,15 +442,15 @@ function HomeScreen({ go, db }) {
       </div>
       <label className="flex items-center gap-2 rounded-sm bg-white px-3 py-3 shadow-sm">
         <Search size={20} className="text-gray-500" />
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Try “cam follower” or “sway bar”" className="w-full bg-transparent text-[17px] outline-none" />
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Try “sway bar”, “air filter” or “end links”" className="w-full bg-transparent text-[17px] outline-none" />
       </label>
-      <div className="mt-1 text-xs muted">Searching guides for 2006 VW GTI 2.0T. Change car below.</div>
+      <div className="mt-1 text-xs muted">Searching every guide. Browse by make to narrow to your car.</div>
 
       {results ? (
         <div className="mt-5 space-y-3">
           {isDisambig ? <div className="muted">Which <span className="font-semibold text-white">{groups[0]}</span> do you mean?</div>
             : <div className="muted">{results.length ? `${results.length} guide${results.length>1?"s":""}` : "Nothing yet for that. Try the part's common name or number."}</div>}
-          {results.map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.id })} />)}
+          {results.map(t => <TaskCard key={t.id} t={t} tag={engineTag(db, t)} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />)}
         </div>
       ) : (
         <>
@@ -436,7 +463,20 @@ function HomeScreen({ go, db }) {
             ))}
           </div>
           <h2 className="mt-8 mb-3 flex items-center gap-2 font-bold text-lg"><FileClock size={20} style={{ color: "#4F9AA1" }} aria-hidden />Recently added</h2><div className="space-y-2">
-          {(showAllRecent ? recent : recent.slice(0, RECENT_MAX)).map(t => <TaskCard key={t.id} t={t} vehicle={vehicleLabel(db, t.powertrainId)} compact onOpen={() => go({ screen: "guide", gid: t.id })} />)}
+          {recent.length === 0 ? (
+            <div className="card rounded-sm bg-white px-5 py-8 text-center shadow-sm">
+              <svg viewBox="0 0 120 90" className="mx-auto h-20 w-28" aria-hidden>
+                <rect x="18" y="16" width="84" height="64" rx="8" fill="#E6E8EB" stroke="#0E494D" strokeWidth="2" />
+                <rect x="18" y="16" width="84" height="16" rx="8" fill="#0E494D" />
+                <rect x="34" y="8" width="8" height="16" rx="3" fill="#0E494D" /><rect x="78" y="8" width="8" height="16" rx="3" fill="#0E494D" />
+                {[42,56,70].map((x, i) => [46, 62].map((y, j) => <rect key={`${i}${j}`} x={x - 5} y={y - 5} width="10" height="10" rx="2" fill={i + j === 3 ? "#E5FE52" : "#B5B9C0"} />))}
+                <circle cx="96" cy="70" r="14" fill="#4F9AA1" /><path d="M89 70 l5 5 l9 -10" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div className="mt-3 font-bold text-[17px]">No new guides in the last two weeks</div>
+              <div className="mt-1 text-sm text-gray-600">Everything we have is in the catalog above. Want something specific? Request it below.</div>
+            </div>
+          ) : null}
+          {(showAllRecent ? recent : recent.slice(0, RECENT_MAX)).map(t => <TaskCard key={t.id} t={t} vehicle={vehicleLabel(db, t.powertrainId, engineTag(db, t))} compact onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />)}
           {recent.length > RECENT_MAX && !showAllRecent ? (
             <button onClick={() => setShowAllRecent(true)} className="flex w-full items-center justify-center gap-1 rounded-sm bg-white px-4 py-3 text-sm font-semibold teal shadow-sm">View all {recent.length}<ChevronDown size={16} /></button>
           ) : null}</div>
@@ -454,20 +494,21 @@ function HomeScreen({ go, db }) {
 }
 
 function Browse({ nav, go, back, db }) {
-  const { brand, model, year, pt, cat } = nav;
-  const Row = ({ title, sub, live, onClick }) => (
-    <button disabled={!live} onClick={onClick} className={`flex w-full items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${live ? "" : "opacity-50"}`}>
-      <div><div className="font-bold text-[17px]">{title}</div>{sub ? <div className="text-sm text-gray-500">{sub}</div> : null}</div>
+  const { brand, model, gen, pt, cat } = nav;
+  const range = g => `${g.from}–${g.to || "present"}`;
+  const Row = ({ title, sub, subAbove, live, onClick }) => (
+    <button disabled={!live} onClick={onClick} className={`card flex w-full items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${live ? "" : "opacity-50"}`}>
+      <div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div>
       {live ? <ChevronRight size={18} className="text-blue-700" /> : <span className="rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Soon</span>}
     </button>
   );
   let title, list;
   if (!model) { title = brand.name; list = db.models[brand.id].map(m => <Row key={m.id} title={m.name} live={m.live} onClick={() => go({ ...nav, model: m })} />); }
-  else if (!year) { title = `${brand.name} ${model.name}`; list = db.years[model.id].map(y => <Row key={y.year} title={y.year} sub={y.gen} live={y.live} onClick={() => go({ ...nav, year: y })} />); }
-  else if (!pt) { title = `${year.year} ${model.name}`; list = db.powertrains[`${model.id}-${year.year}`].map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
-  else if (!cat) { title = `${year.year} ${model.name} ${pt.name}`; list = db.categories.map(c => { const n = db.tasks.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} onClick={() => go({ ...nav, cat: c })} />; }); }
-  else { title = cat; list = db.tasks.filter(t => t.cat === cat).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.id })} />); }
-  const crumbs = [brand?.name, model?.name, year?.year, pt?.name, cat].filter(Boolean).join(" / ");
+  else if (!gen) { title = `${brand.name} ${model.name}`; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => go({ ...nav, gen: g })} />); }
+  else if (!pt) { title = `${model.name} ${gen.name} · ${range(gen)}`; list = (db.powertrains[gen.id] || []).map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
+  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} onClick={() => go({ ...nav, cat: c })} />; }); }
+  else { title = cat; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
+  const crumbs = [brand?.name, model?.name, gen?.name, pt?.name, cat].filter(Boolean).join(" / ");
   return (
     <Frame onHome={() => go({ screen: "home" })} onBack={back} crumbs={crumbs}>
       <h1 className="wide font-black text-3xl tracking-tight pt-4 pb-4">{title}</h1>
@@ -493,7 +534,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
   const [showAM, setShowAM] = useState(false);
   const chosen = v && choice ? v.options.find(o => o.id === choice) : null;
   const [active, setActive] = useState("glance");
-  const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],["steps","Steps"],["read", g.check.tab],["after","After"],["sources","Sources"]];
+  const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],["steps","Steps"],...(g.alsoReplace && g.alsoReplace.length ? [["also","While you're in there"]] : []),["read", g.check.tab],["after","After"],["sources","Sources"]];
   const tabRefs = useRef({});
 
   // Scrollspy: the active tab is the last section whose top has passed the sticky bars.
@@ -526,8 +567,8 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
   const Glance = ({ label, icon, children, onClick }) => {
     const inner = <>{onClick ? <ChevronRight size={16} className="absolute right-2 top-2 metric" /> : null}<div className="flex items-center gap-1 text-xs text-gray-500">{icon}{label}</div>{children}</>;
     return onClick
-      ? <button onClick={onClick} className="relative rounded-sm bg-white p-3 text-left shadow-sm">{inner}</button>
-      : <div className="relative rounded-sm bg-white p-3 shadow-sm">{inner}</div>;
+      ? <button onClick={onClick} className="card relative rounded-sm bg-white p-3 text-left shadow-sm">{inner}</button>
+      : <div className="card relative rounded-sm bg-white p-3 shadow-sm">{inner}</div>;
   };
 
   return (
@@ -549,7 +590,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
         <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute right-0 -bottom-4 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
       </figure>
 
-      <nav className="sticky top-[52px] z-10 -mx-4 mt-5 flex gap-1 overflow-x-auto bg-[#E9EBEE]/95 px-4 py-2 backdrop-blur" aria-label="Contents" style={{ scrollbarWidth: "none" }}>
+      <nav className="sticky top-[52px] z-10 -mx-4 mt-5 flex gap-1 overflow-x-auto bg-[#FDFDFC]/95 px-4 py-2 backdrop-blur" aria-label="Contents" style={{ scrollbarWidth: "none" }}>
         {nav.map(([id, l]) => <button key={id} ref={el => (tabRefs.current[id] = el)} onClick={() => jump(id)} aria-current={active===id ? "true" : undefined} className={`shrink-0 rounded-sm px-3 py-1.5 text-sm font-semibold transition-colors ${active===id ? "active-fill" : "bg-white text-gray-700"}`}>{l}</button>)}
       </nav>
 
@@ -561,8 +602,8 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
         <Glance label="Watch out for"><div className="font-semibold mt-1 leading-snug">{g.glance.risk}</div></Glance>
       </div>
       <p className="mt-2 text-sm text-gray-600">{txt(g.glance.note)}</p>
-      <Art id={g.kind === "upgrade" ? "rsbhero" : "hero"} cap={g.heroCap} />
-      <Video id={g.embeds[0].id} title="Watch the whole job" note={g.embeds[0].note} />
+      <Art id={g.heroId || (g.kind === "upgrade" ? "rsbhero" : "hero")} cap={g.heroCap} />
+      {g.embeds && g.embeds.length && g.embeds[0].id ? <Video id={g.embeds[0].id} title="Watch the whole job" note={g.embeds[0].note} /> : null}
 
       <H2 id="should">Should you do this?</H2>
       <div className="font-semibold">Yes, if any of these are true</div>
@@ -572,7 +613,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       <div className="mt-3"><Dots c={g.should.confidence} /></div>
 
       <H2 id="need">What you need</H2>
-      <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
+      <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
         {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div>{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
       </div>
       <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm px-4 py-3 text-left font-semibold text-white" style={{ background: "#0E494D" }}><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
@@ -584,7 +625,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
           </button>
           {showAM ? (
             <div className="divide-y divide-gray-200 border-t border-gray-200">
-              {g.aftermarket.map((a, i) => (
+              {g.aftermarket.filter(x => vis(x, choice)).map((a, i) => (
                 <div key={i} className="p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div><div className="font-semibold">{a.name}</div><div className="text-sm text-gray-600">{a.note}</div></div>
@@ -599,7 +640,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
           ) : null}
         </div>
       ) : null}
-      <div className="mt-3 rounded-sm bg-white shadow-sm divide-y divide-gray-200">
+      <div className="card mt-3 rounded-sm bg-white shadow-sm divide-y divide-gray-200">
         {g.tools.filter(x => vis(x, choice)).map((t, i) => <div key={i} className="flex gap-3 p-3"><Wrench size={18} className="mt-0.5 shrink-0 text-gray-500" /><div className="flex-1"><div className="font-semibold">{t.name}</div>{t.note ? <div className="text-sm text-gray-600">{t.note}</div> : null}</div><div className="shrink-0 text-sm text-gray-500">{t.price}</div></div>)}
       </div>
       {gid === "cam-follower" ? <Art id="bits" cap={'Both fit a ¼" drive. The forums are full of people who bought the wrong one.'} /> : null}
@@ -607,13 +648,26 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       <ul className="mt-2 space-y-2">{g.before.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{s}</li>)}</ul>
 
       <H2 id="steps">Steps</H2>
-      {g.steps.filter(x => vis(x, choice)).map(s => <Step key={s.n} s={s} choice={choice} />)}
+      {g.steps.filter(x => vis(x, choice)).map((s, i) => <Step key={i} s={{ ...s, n: i + 1 }} choice={choice} />)}
+
+      {g.alsoReplace && g.alsoReplace.length ? (<>
+        <H2 id="also"><span className="inline-flex items-center gap-2"><Lightbulb size={24} className="shrink-0" style={{ color: "#936700" }} aria-hidden />While you're in there</span></H2>
+        <p className="text-gray-600 -mt-1 mb-3">Parts worth doing now, because the hard part of reaching them is already done.</p>
+        <div className="space-y-2">
+          {g.alsoReplace.filter(x => vis(x, choice)).map((r, i) => (
+            <div key={i} className="card rounded-sm bg-white p-3 shadow-sm flex gap-3">
+              <PlusCircle size={20} className="mt-0.5 shrink-0" style={{ color: "#0E494D" }} aria-hidden />
+              <div><div className="font-bold">{r.name}</div><div className="mt-0.5 text-[15px] text-gray-700 leading-relaxed">{r.why}</div></div>
+            </div>
+          ))}
+        </div>
+      </>) : null}
 
       <H2 id="read">{g.check.title}</H2>
       <Art id={g.check.illId} cap={g.check.illCap} />
       <div className="space-y-2">
         {g.check.rows.map((r, i) => (
-          <div key={i} className="rounded-sm bg-white p-3 shadow-sm">
+          <div key={i} className="card rounded-sm bg-white p-3 shadow-sm">
             <div className="flex items-baseline gap-2"><span className="wide font-black text-2xl text-gray-400">{"ABC"[i]}</span><div className="font-bold">{r.see}</div></div>
             <div className="mt-1 text-[15px] text-gray-700">{r.means}</div>
             <div className="mt-2 rounded-sm bg-blue-50 px-3 py-2 text-[15px]"><span className="font-semibold">Do this: </span>{r.do}</div>
@@ -629,7 +683,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       <H2 id="sources">Where sources disagree</H2>
       <div className="space-y-2">
         {g.disagreements.map((d, i) => (
-          <div key={i} className="rounded-sm bg-white p-3 shadow-sm">
+          <div key={i} className="card rounded-sm bg-white p-3 shadow-sm">
             <div className="font-bold">{d.topic}</div>
             <div className="mt-1 text-[15px] text-gray-600">{d.pos}</div>
             <div className="mt-1 text-[15px]"><span className="font-semibold teal">Our call: </span>{d.call}</div>
@@ -672,17 +726,17 @@ function KitScreen({ go, back, guide: g, choice }) {
         <p className="mt-2 text-gray-600">Tick off what you already own. Prices are typical, not quotes.</p>
       </div>
       <h2 className="mt-6 mb-2 font-bold text-lg">Parts</h2>
-      <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
+      <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
         {g.parts.filter(x => vis(x, choice)).map((p, i) => <Row key={i} k={`p${i}`} name={p.name} note={(p.tier ? (TIER[p.tier] || p.tier) + " · " : "") + (p.note || "")} pn={p.pn} price={p.price} links={p.links} />)}
       </div>
       {g.aftermarket && g.aftermarket.length ? (<>
         <h2 className="mt-6 mb-2 font-bold text-lg">Aftermarket options</h2>
-        <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
+        <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
           {g.aftermarket.map((a, i) => <Row key={i} k={`a${i}`} name={a.name} note={(a.signal ? a.signal + " · " : "") + (a.note || "")} price={a.price} links={a.links} />)}
         </div>
       </>) : null}
       <h2 className="mt-6 mb-2 font-bold text-lg">Tools</h2>
-      <div className="rounded-sm bg-white shadow-sm divide-y divide-gray-200">
+      <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
         {g.tools.filter(x => vis(x, choice)).map((t, i) => <Row key={i} k={`t${i}`} name={t.name} note={t.note} price={t.price} />)}
       </div>
       <p className="mt-3 text-sm text-gray-500">Tool links arrive once we've picked retail partners. Part links go to the retailers whose guides we drew from.</p>
@@ -762,10 +816,14 @@ export default function App() {
   const go = n => setStack(s => [...s, n]);
   const back = () => setStack(s => (s.length > 1 ? s.slice(0, -1) : s));
   const patch = p => setStack(s => [...s.slice(0, -1), { ...s[s.length - 1], ...p }]);
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => { window.scrollTo(0, 0); }, [nav.screen, nav.gid]);
   // Loads the vehicle catalog plus the task list for the current vehicle. Guides load one at a time when opened.
   useEffect(() => {
-    Promise.all([loadCatalog(), loadTasks("bpy")])
+    Promise.all([loadCatalog(), loadTasks()])
       .then(([cat, tasks]) => setDb({ ...cat, tasks }))
       .catch(e => setErr(e.message || String(e)));
   }, []);

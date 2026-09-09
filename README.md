@@ -44,11 +44,17 @@ Guides are JSON in the `guides` table (see `schema.md` for the shape). New guide
 same way as step 1. No redeploy needed; the app fetches each guide when it's opened.
 
 ## Adding an illustration
+Illustration background is always `#F9F9F5` (the card colour) unless a guide specifies otherwise.
 Illustrations are `.svg` files in the Supabase Storage bucket `illustrations` (created by `supabase/003_illustrations_bucket.sql`).
 Upload `<id>.svg` on the Storage page and reference it from a guide block as `{ "t": "ill", "id": "<id>", "cap": "..." }`.
 No redeploy needed. The originals for the current guides are in `illustrations/`.
 
-## Sharing guides across models
+## Sharing guides across engines and models
+Tasks carry a `guide_id`; several tasks (one per engine) can point at the same guide. The Mk5 GTI's FSI (bpy) and TSI (ccta)
+share 15 guides this way. Engine-specific jobs get their own guide and their own task row. The app tags a guide with the
+engine it applies to when a generation has more than one engine.
+
+## Sharing guides across models (older note)
 Tasks attach to an engine (`tasks.powertrain_id`, e.g. `bpy`), not a model. Adding a row to `powertrains` for
 another car with the same engine (Jetta 2006 · bpy) makes every BPY guide appear for it. Model-specific differences
 go in the guide as `only:` tagged blocks or a `fork`.
