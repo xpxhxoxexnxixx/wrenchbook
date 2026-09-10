@@ -74,14 +74,17 @@ const CSS = `
 /* ------------------------------------------------------------------ */
 
 /* Variant visibility: any item may carry `only: ["optionId", ...]`. Items without `only` show for everyone. */
-const vis = (item, choice) => !item || !item.only || !choice || item.only.includes(choice);
+/* `choice` is one option id (single question) or an array of ids (one per question). An `only` entry may be a single id or
+   an "a+b" combination that needs every listed id chosen. Items with no `only` show for everyone. */
+const chosenIds = choice => new Set(Array.isArray(choice) ? choice : choice ? [choice] : []);
+const vis = (item, choice) => { if (!item || !item.only || !choice) return true; const c = chosenIds(choice); return item.only.some(e => String(e).split("+").every(id => c.has(id))); };
 const txt = item => (typeof item === "string" ? item : item.text);
 
-const VariantModal = ({ v, onPick }) => (
+const VariantModal = ({ v, onPick, step }) => (
   <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-labelledby="variant-q">
     <div className="absolute inset-0 bg-white/40 backdrop-blur-xl" />
     <div className="relative m-3 w-full max-w-[480px] rounded-md p-5 shadow-2xl" style={{ background: "#FDFDFC" }}>
-      <div className="text-xs text-gray-500">Before you start</div>
+      <div className="text-xs text-gray-500">Before you start{step ? ` · question ${step}` : ""}</div>
       <h2 id="variant-q" className="wide font-black text-2xl leading-tight mt-1">{v.question}</h2>
       {v.hint ? <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">{v.hint}</p> : null}
       <div className="mt-4 grid gap-2">
@@ -382,7 +385,10 @@ const TaskCard = ({ t, onOpen, vehicle, compact, tag }) => (
   </button>
 );
 
-/** Human label for the car(s) a task fits, derived from the catalog: "2006 Volkswagen GTI · 2.0T FSI". */
+/** "2006–2009" · "2022–present" · "2008" when a generation is a single model year */
+const yearRange = g => (g.to && g.to !== g.from) || !g.to ? `${g.from}–${g.to || "present"}` : `${g.from}`;
+
+/** Human label for the car(s) a task fits, derived from the catalog: "2006–2009 Volkswagen GTI · FSI & TSI". */
 const vehicleLabel = (db, powertrainId, engineOverride) => {
   const rows = Object.entries(db.powertrains).flatMap(([genId, list]) => list.filter(p => p.id === powertrainId).map(p => ({ ...p, genId })));
   if (!rows.length) return null;
@@ -392,7 +398,7 @@ const vehicleLabel = (db, powertrainId, engineOverride) => {
   const cars = [...new Set(rows.map(r => {
     const g = allGens.find(x => x.id === r.genId);
     if (!g) return null;
-    return [`${g.from}–${g.to || "present"}`, brandOf(g.model_id)?.name, modelName(g.model_id)].filter(Boolean).join(" ");
+    return [yearRange(g), brandOf(g.model_id)?.name, modelName(g.model_id)].filter(Boolean).join(" ");
   }).filter(Boolean))];
   if (!cars.length) return rows[0].name || null;
   const engine = engineOverride ? engineOverride.replace(/ only$/, "") : allEngines(db, powertrainId);
@@ -421,10 +427,37 @@ const dedupeByGuide = tasks => { const seen = new Set(); return tasks.filter(t =
 
 function HomeScreen({ go, db }) {
   const [q, setQ] = useState("");
+  // Search understands a whole sentence: vehicle words (year, make, model) narrow the cars, filler words are ignored, and every
+  // remaining word has to appear somewhere in a guide's title, aliases or group. "spark plug change 2006 VW GTI" works.
   const results = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (s.length < 2) return null;
-    return dedupeByGuide(db.tasks.filter(t => t.title.toLowerCase().includes(s) || t.aliases.some(a => a.includes(s)) || (t.group && t.group.includes(s))));
+    const STOP = new Set(["change","changing","replace","replacing","replacement","install","installing","upgrade","how","to","do","i","a","an","the","my","on","for","and","of","with","fix","swap","guide","diy"]);
+    const brands = db.brands.map(b => ({ id: b.id, names: [b.id, b.name.toLowerCase(), ...(b.id === "vw" ? ["volkswagen"] : [])] }));
+    const models = Object.entries(db.models).flatMap(([bid, ms]) => ms.map(m => ({ id: m.id, brand: bid, names: m.name.toLowerCase().split(/\s*\/\s*/) })));
+    const gens = Object.entries(db.gens).flatMap(([mid, gs]) => gs.map(g => ({ ...g, model_id: mid })));
+    const pts = Object.values(db.powertrains).flat();
+    const words = s.split(/[^a-z0-9.+-]+/).filter(Boolean);
+    let year = null, model = null, brand = null; const terms = [];
+    for (const w of words) {
+      if (/^(19|20)\d\d$/.test(w)) { year = +w; continue; }
+      const bm = brands.find(b => b.names.includes(w)); if (bm) { brand = bm.id; continue; }
+      const mm = models.find(m => m.names.includes(w)); if (mm) { model = mm.id; continue; }
+      if (STOP.has(w)) continue;
+      terms.push(w);
+    }
+    if (!terms.length) return [];
+    const okPt = new Set(pts.filter(p => {
+      const g = gens.find(x => x.id === p.generation_id); if (!g) return false;
+      if (model && g.model_id !== model) return false;
+      if (brand && !(db.models[brand] || []).some(m => m.id === g.model_id)) return false;
+      if (year && !(g.from <= year && (g.to == null || year <= g.to))) return false;
+      return true;
+    }).map(p => p.id));
+    const hay = t => [t.title, ...t.aliases, t.group || ""].join(" ").toLowerCase();
+    const hit = t => { const h = hay(t); return terms.every(w => h.includes(w) || h.includes(w.replace(/s$/, ""))); };
+    const filtered = db.tasks.filter(t => okPt.has(t.powertrainId) && hit(t));
+    return dedupeByGuide(filtered.length ? filtered : db.tasks.filter(hit));
   }, [q]);
   const [showAllRecent, setShowAllRecent] = useState(false);
   const RECENT_DAYS = 14, RECENT_MAX = 5;
@@ -442,9 +475,9 @@ function HomeScreen({ go, db }) {
       </div>
       <label className="flex items-center gap-2 rounded-sm bg-white px-3 py-3 shadow-sm">
         <Search size={20} className="text-gray-500" />
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Try “sway bar”, “air filter” or “end links”" className="w-full bg-transparent text-[17px] outline-none" />
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder='Try "spark plug change 2006 VW GTI"' className="w-full bg-transparent text-[17px] outline-none" />
       </label>
-      <div className="mt-1 text-xs muted">Searching every guide. Browse by make to narrow to your car.</div>
+      <div className="mt-1 text-xs muted">Add a year, make or model to narrow to your car; plain part names work too.</div>
 
       {results ? (
         <div className="mt-5 space-y-3">
@@ -493,25 +526,103 @@ function HomeScreen({ go, db }) {
   );
 }
 
+
+/* Category graphics: small multi-colour marks in the app's teals and blues, one step above an icon. Shown beside category titles. */
+const CAT_COL = { deep: "#0F2230", navy: "#0B4664", teal: "#0E494D", mid: "#4F9AA1", light: "#75D3D8", pale: "#F1FAFF" };
+const CatArt = ({ name, size = 48 }) => {
+  const c = CAT_COL;
+  const art = {
+    Engine: (<>
+      <rect x="8" y="18" width="32" height="18" rx="3" fill={c.navy} />
+      <rect x="11" y="12" width="26" height="8" rx="2" fill={c.teal} />
+      {[15, 21, 27, 33].map(x => <rect key={x} x={x} y="8" width="3" height="5" rx="1" fill={c.light} />)}
+      {[13, 20, 27, 34].map(x => <rect key={x} x={x} y="22" width="4" height="10" rx="1" fill={c.mid} />)}
+      <circle cx="40" cy="30" r="5" fill={c.mid} stroke={c.deep} strokeWidth="1.5" />
+      <circle cx="40" cy="30" r="1.8" fill={c.pale} />
+      <path d="M6 30 h-3 v6 h6" fill="none" stroke={c.deep} strokeWidth="2" strokeLinecap="round" />
+      <rect x="4" y="36" width="40" height="4" rx="2" fill={c.deep} />
+    </>),
+    Suspension: (<>
+      <rect x="21" y="4" width="6" height="40" rx="2" fill={c.navy} />
+      <path d="M14 10 l20 4 l-20 4 l20 4 l-20 4 l20 4 l-20 4 l20 4" fill="none" stroke={c.light} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="16" y="2" width="16" height="5" rx="2" fill={c.teal} />
+      <path d="M24 40 L40 44" stroke={c.mid} strokeWidth="4" strokeLinecap="round" />
+      <circle cx="41" cy="44" r="3" fill={c.deep} />
+      <circle cx="24" cy="42" r="4" fill={c.deep} />
+    </>),
+    Brakes: (<>
+      <circle cx="22" cy="26" r="18" fill={c.mid} />
+      <circle cx="22" cy="26" r="12" fill={c.light} />
+      <circle cx="22" cy="26" r="5" fill={c.navy} />
+      {[0, 60, 120, 180, 240, 300].map(a => <circle key={a} cx={22 + 8.5 * Math.cos(a * Math.PI / 180)} cy={26 + 8.5 * Math.sin(a * Math.PI / 180)} r="1.6" fill={c.teal} />)}
+      <path d="M34 10 a20 20 0 0 1 8 16 l-6 1 a14 14 0 0 0 -6 -12 z" fill={c.deep} />
+      <rect x="36" y="14" width="5" height="4" rx="1" fill={c.pale} />
+    </>),
+    Drivetrain: (<>
+      <circle cx="16" cy="24" r="11" fill={c.navy} />
+      {[0, 45, 90, 135, 180, 225, 270, 315].map(a => <rect key={a} x="14" y="9" width="4" height="6" rx="1" fill={c.navy} transform={`rotate(${a} 16 24)`} />)}
+      <circle cx="16" cy="24" r="5" fill={c.light} />
+      <circle cx="33" cy="30" r="8" fill={c.mid} />
+      {[0, 60, 120, 180, 240, 300].map(a => <rect key={a} x="31.5" y="19" width="3" height="5" rx="1" fill={c.mid} transform={`rotate(${a} 33 30)`} />)}
+      <circle cx="33" cy="30" r="3.5" fill={c.pale} />
+      <path d="M33 38 v6 M27 44 h12" stroke={c.deep} strokeWidth="2.5" strokeLinecap="round" />
+    </>),
+    Electrical: (<>
+      <rect x="6" y="16" width="28" height="22" rx="3" fill={c.navy} />
+      <rect x="10" y="12" width="6" height="5" rx="1" fill={c.teal} />
+      <rect x="24" y="12" width="6" height="5" rx="1" fill={c.teal} />
+      <path d="M22 18 l-7 11 h6 l-3 9 l9 -12 h-6 l3 -8 z" fill={c.light} />
+      <path d="M34 22 h6 q4 0 4 4 v6" fill="none" stroke={c.mid} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="44" cy="35" r="3" fill={c.pale} stroke={c.mid} strokeWidth="2" />
+    </>),
+    Exterior: (<>
+      <path d="M4 32 l4 -8 h8 l6 -7 h12 l8 7 h4 v8 z" fill={c.navy} />
+      <path d="M17 24 l5 -6 h10 l6 6 z" fill={c.light} />
+      <rect x="4" y="30" width="42" height="4" rx="2" fill={c.deep} />
+      <circle cx="14" cy="34" r="5" fill={c.deep} /><circle cx="14" cy="34" r="2.2" fill={c.pale} />
+      <circle cx="36" cy="34" r="5" fill={c.deep} /><circle cx="36" cy="34" r="2.2" fill={c.pale} />
+      <rect x="42" y="26" width="4" height="3" rx="1" fill={c.mid} />
+    </>),
+    Interior: (<>
+      <path d="M12 8 q-4 0 -4 4 v16 q0 4 4 4 h8 v-24 z" fill={c.navy} />
+      <path d="M10 32 h12 l4 8 h-20 z" fill={c.teal} />
+      <rect x="6" y="40" width="22" height="3" rx="1.5" fill={c.deep} />
+      <circle cx="36" cy="24" r="9" fill="none" stroke={c.mid} strokeWidth="3" />
+      <circle cx="36" cy="24" r="2.5" fill={c.light} />
+      <path d="M36 26.5 v6 M27.5 22 h5 M39.5 22 h5" stroke={c.mid} strokeWidth="2.5" strokeLinecap="round" />
+    </>),
+  }[name];
+  if (!art) return null;
+  return <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className="shrink-0">{art}</svg>;
+};
+
 function Browse({ nav, go, back, db }) {
   const { brand, model, gen, pt, cat } = nav;
-  const range = g => `${g.from}–${g.to || "present"}`;
-  const Row = ({ title, sub, subAbove, live, onClick }) => (
+  const range = yearRange;
+  // A generation with a single engine skips the engine picker and goes straight to categories.
+  const pickGen = g => { const pts = (db.powertrains[g.id] || []).filter(p => p.live); go(pts.length === 1 ? { ...nav, gen: g, pt: pts[0] } : { ...nav, gen: g }); };
+  const Row = ({ title, sub, subAbove, live, onClick, art }) => (
     <button disabled={!live} onClick={onClick} className={`card flex w-full items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${live ? "" : "opacity-50"}`}>
-      <div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div>
+      <div className="flex items-center gap-3">{art || null}<div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div></div>
       {live ? <ChevronRight size={18} className="text-blue-700" /> : <span className="rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Soon</span>}
     </button>
   );
   let title, list;
   if (!model) { title = brand.name; list = db.models[brand.id].map(m => <Row key={m.id} title={m.name} live={m.live} onClick={() => go({ ...nav, model: m })} />); }
-  else if (!gen) { title = `${brand.name} ${model.name}`; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => go({ ...nav, gen: g })} />); }
+  else if (!gen) { title = `${brand.name} ${model.name}`; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => pickGen(g)} />); }
   else if (!pt) { title = `${model.name} ${gen.name} · ${range(gen)}`; list = (db.powertrains[gen.id] || []).map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
-  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} onClick={() => go({ ...nav, cat: c })} />; }); }
+  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} onClick={() => go({ ...nav, cat: c })} />; }); }
   else { title = cat; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
-  const crumbs = [brand?.name, model?.name, gen?.name, pt?.name, cat].filter(Boolean).join(" / ");
+  // The page title carries the path, so the header shows no crumb. The task list is the one screen whose
+  // title (the category) says nothing about the car, so the vehicle sits above it.
+  const above = cat && pt ? `${model.name} ${gen.name} · ${shortEngine(pt)}` : null;
   return (
-    <Frame onHome={() => go({ screen: "home" })} onBack={back} crumbs={crumbs}>
-      <h1 className="wide font-black text-3xl tracking-tight pt-4 pb-4">{title}</h1>
+    <Frame onHome={() => go({ screen: "home" })} onBack={back}>
+      {above ? <div className="pt-4 text-xs font-bold uppercase tracking-wide teal">{above}</div> : null}
+      <div className={`flex items-center gap-3 ${above ? "pt-1" : "pt-4"} pb-4`}>
+        {cat ? <CatArt name={cat} size={52} /> : null}
+        <h1 className="wide font-black text-3xl tracking-tight">{title}</h1>
+      </div>
       <div className="space-y-2">{list}</div>
     </Frame>
   );
@@ -529,12 +640,28 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice, onChoice }) {
 function GuideBody({ go, back, g, initialChoice, onChoice }) {
   const gid = g.id;
   const v = g.variants;
+  // One question ({ question, options }) or several ({ questions: [...] }); the answer is an id or an array of ids.
+  const qs = v ? (v.questions || [v]) : [];
   const [choice, setChoice] = useState(initialChoice || null);
-  const [asking, setAsking] = useState(!!v && !initialChoice);
+  const answered = qs.length <= 1 ? (choice ? 1 : 0) : (Array.isArray(choice) ? choice.length : 0);
+  const [asking, setAsking] = useState(qs.length > 0 && answered < qs.length);
   const [showAM, setShowAM] = useState(false);
-  const chosen = v && choice ? v.options.find(o => o.id === choice) : null;
+  const chosen = qs.length && answered >= qs.length ? { label: qs.map((q, i) => q.options.find(o => o.id === (qs.length <= 1 ? choice : choice[i]))?.label).filter(Boolean).join(" · ") } : null;
+  const pick = id => {
+    const next = qs.length <= 1 ? id : [...(Array.isArray(choice) ? choice : []), id];
+    setChoice(next);
+    const done = qs.length <= 1 || next.length >= qs.length;
+    if (done) { setAsking(false); onChoice && onChoice(next); }
+  };
+  const reask = () => { setChoice(qs.length <= 1 ? null : []); setAsking(true); };
   const [active, setActive] = useState("glance");
-  const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],["steps","Steps"],...(g.alsoReplace && g.alsoReplace.length ? [["also","While you're in there"]] : []),["read", g.check.tab],["after","After"],["sources","Sources"]];
+  // Chapters: a long guide can group its steps under `chapters` ([{ id, title, blurb }], steps carry `chapter`). Each chapter with
+  // visible steps gets its own tab and heading; steps still number straight through. Guides without chapters get one "Steps" tab.
+  const visibleSteps = g.steps.filter(x => vis(x, choice));
+  const chapters = (g.chapters || []).filter(c => visibleSteps.some(st => st.chapter === c.id));
+  const stepTabs = chapters.length ? chapters.map(c => [`ch-${c.id}`, c.title]) : [["steps", "Steps"]];
+  const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],...stepTabs,...(g.alsoReplace && g.alsoReplace.length ? [["also","While you're in there"]] : []),["read", g.check.tab],["after","After"],["sources","Sources"]];
+  const navRef = useRef(nav); navRef.current = nav;
   const tabRefs = useRef({});
 
   // Scrollspy: the active tab is the last section whose top has passed the sticky bars.
@@ -544,6 +671,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         const line = 120;
+        const nav = navRef.current;
         let cur = nav[0][0];
         for (const [id] of nav) {
           const el = document.getElementById(id);
@@ -577,12 +705,12 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
         <div className="text-sm text-gray-500">{g.category} · {g.fits}</div>
         <h1 className="wide font-black text-[32px] leading-[1.02] tracking-tight mt-1">{g.title}</h1>
         {chosen ? (
-          <button onClick={() => setAsking(true)} className="mt-3 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm font-semibold text-white" style={{ background: "#0F2230" }}>
-            <span>{chosen.label}</span><Repeat size={14} className="text-gray-300" /><span className="text-gray-300 font-normal">change</span>
+          <button onClick={reask} className="mt-3 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-left text-sm font-semibold text-white" style={{ background: "#0F2230" }}>
+            <span className="flex-1 min-w-0">{chosen.label}</span><span className="inline-flex shrink-0 items-center gap-1"><Repeat size={14} className="text-gray-300" /><span className="text-gray-300 font-normal">change</span></span>
           </button>
         ) : null}
       </div>
-      {asking && v ? <VariantModal v={v} onPick={id => { setChoice(id); setAsking(false); onChoice && onChoice(id); }} /> : null}
+      {asking && qs.length ? <VariantModal v={qs[Math.min(answered, qs.length - 1)]} step={qs.length > 1 ? `${answered + 1} of ${qs.length}` : null} onPick={pick} /> : null}
 
       <figure className="relative mt-5 mb-1 px-6">
         <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
@@ -603,7 +731,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       </div>
       <p className="mt-2 text-sm text-gray-600">{txt(g.glance.note)}</p>
       <Art id={g.heroId || (g.kind === "upgrade" ? "rsbhero" : "hero")} cap={g.heroCap} />
-      {g.embeds && g.embeds.length && g.embeds[0].id ? <Video id={g.embeds[0].id} title="Watch the whole job" note={g.embeds[0].note} /> : null}
+      {(g.embeds || []).filter(e => e.id && vis(e, choice)).map((e, i) => <Video key={e.id} id={e.id} title={i === 0 ? "Watch the whole job" : "Also worth watching"} note={e.note} />)}
 
       <H2 id="should">Should you do this?</H2>
       <div className="font-semibold">Yes, if any of these are true</div>
@@ -614,7 +742,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
 
       <H2 id="need">What you need</H2>
       <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div>{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="max-w-[45%] shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono text-xs leading-snug break-words">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
       </div>
       <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm px-4 py-3 text-left font-semibold text-white" style={{ background: "#0E494D" }}><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
       {g.aftermarket && g.aftermarket.length ? (
@@ -645,10 +773,18 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       </div>
       {gid === "cam-follower" ? <Art id="bits" cap={'Both fit a ¼" drive. The forums are full of people who bought the wrong one.'} /> : null}
       <h3 className="mt-6 font-bold text-lg">Before you start</h3>
-      <ul className="mt-2 space-y-2">{g.before.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{s}</li>)}</ul>
+      <ul className="mt-2 space-y-2">{g.before.filter(x => vis(x, choice)).map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{txt(s)}</li>)}</ul>
 
-      <H2 id="steps">Steps</H2>
-      {g.steps.filter(x => vis(x, choice)).map((s, i) => <Step key={i} s={{ ...s, n: i + 1 }} choice={choice} />)}
+      {chapters.length ? chapters.map(c => { const mine = visibleSteps.filter(st => st.chapter === c.id); const start = visibleSteps.indexOf(mine[0]); return (
+        <div key={c.id}>
+          <H2 id={`ch-${c.id}`}>{c.title}</H2>
+          {c.blurb ? <p className="text-gray-600 -mt-1 mb-3">{c.blurb}</p> : null}
+          {mine.map((s, i) => <Step key={i} s={{ ...s, n: start + i + 1 }} choice={choice} />)}
+        </div>); })
+      : (<>
+        <H2 id="steps">Steps</H2>
+        {visibleSteps.map((s, i) => <Step key={i} s={{ ...s, n: i + 1 }} choice={choice} />)}
+      </>)}
 
       {g.alsoReplace && g.alsoReplace.length ? (<>
         <H2 id="also"><span className="inline-flex items-center gap-2"><Lightbulb size={24} className="shrink-0" style={{ color: "#936700" }} aria-hidden />While you're in there</span></H2>
