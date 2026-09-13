@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { loadCatalog, loadTasks, loadGuide, illustrationUrl, submitRequest } from "./lib/data";
 import { Search, ChevronRight, ChevronLeft, Clock, Wrench, Gauge, ShieldAlert, Play, Quote, ExternalLink, ShoppingCart, ChevronDown, Star, Repeat, Zap, X, Maximize2, Check, ThumbsUp, Hourglass, FileClock, MessageSquarePlus, Send, PlusCircle, Lightbulb, CalendarCheck } from "lucide-react";
 
@@ -21,6 +21,7 @@ const CSS = `
 .wb .wb-header-dark { background: #051824; color: #E6F8F8; }
 .wb .wb-tabs { position: sticky; top: 51px; z-index: 10; padding-top: 9px; padding-bottom: 8px; background: rgba(253,253,252,0.95); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); scrollbar-width: none; }
 .wb .wb-tabs::-webkit-scrollbar { display: none; }
+.wb .tab-idle { background:#F3F3EF; }
 .wb h2[id], .wb #glance, .wb [id^="step-"] { scroll-margin-top: 104px; }
 .wb .wide { letter-spacing: -0.02em; }
 .wb .narrow { letter-spacing: 0; }
@@ -79,14 +80,32 @@ const CSS = `
 /* SMALL PARTS                                                         */
 /* ------------------------------------------------------------------ */
 
+/* Scroll every scrolling root to the top. iOS Safari and desktop browsers disagree on which one carries the offset. */
+const toTop = () => { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; };
+/* While an overlay is open, the page behind it must not scroll: a drag on a non-scrolling overlay otherwise moves the
+   page underneath, which is how a guide ends up opening a few lines down after its pre-question. */
+const useLockBodyScroll = () => {
+  useEffect(() => {
+    const prev = document.body.style.overflow; document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+};
+
 /* Variant visibility: any item may carry `only: ["optionId", ...]`. Items without `only` show for everyone. */
 const vis = (item, choice) => !item || !item.only || !choice || item.only.includes(choice);
 const txt = item => (typeof item === "string" ? item : item.text);
 
-const VariantModal = ({ v, onPick }) => (
-  <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-labelledby="variant-q">
+const VariantModal = ({ v, onPick }) => {
+  useLockBodyScroll();
+  // The overlay itself scrolls. With a bottom-aligned card, a question with five options could be taller than the
+  // phone screen; its top was pushed above the viewport with no way to reach it. Now a short card still sits at
+  // the bottom, and a tall one starts at the top and scrolls within the overlay.
+  return (
+  <div className="fixed inset-0 z-40" role="dialog" aria-modal="true" aria-labelledby="variant-q">
     <div className="absolute inset-0 bg-white/40 backdrop-blur-xl" />
-    <div className="relative m-3 w-full max-w-[480px] rounded-md p-5 shadow-2xl" style={{ background: "#FDFDFC" }}>
+    <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+    <div className="flex min-h-full items-end justify-center p-3 sm:items-center">
+    <div className="relative w-full max-w-[480px] rounded-md p-5 shadow-2xl" style={{ background: "#FDFDFC" }}>
       <div className="text-xs text-gray-500">Before you start</div>
       <h2 id="variant-q" className="wide font-black text-2xl leading-tight mt-1">{v.question}</h2>
       {v.hint ? <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">{v.hint}</p> : null}
@@ -100,8 +119,11 @@ const VariantModal = ({ v, onPick }) => (
       </div>
       <p className="mt-3 text-xs text-gray-500">You can change this any time from the top of the guide.</p>
     </div>
+    </div>
+    </div>
   </div>
-);
+  );
+};
 
 const TIER = { oe: "OE · VW box", oem: "OEM · same part, maker's box", aftermarket: "Aftermarket" };
 
@@ -414,8 +436,8 @@ const TaskCard = ({ t, onOpen, vehicle, compact, tag }) => (
   <button onClick={() => t.live && onOpen(t)} disabled={!t.live} className={`card w-full rounded-sm bg-white p-4 text-left shadow-sm ${t.live ? "" : "opacity-60"}`}>
     <div className="flex items-start justify-between gap-3">
       <div>
-        {vehicle ? <div className="mb-1 inline-block rounded-sm px-2 py-0.5 text-xs font-semibold teal" style={{ background: "rgba(14,73,77,0.08)" }}>{vehicle}</div> : null}
-        <div className="text-xs text-gray-500">{t.cat}{tag ? <span className="ml-2 rounded-sm px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide" style={{ background: "#E5FE52", color: "#343D01" }}>{tag}</span> : null}</div>
+        {vehicle ? <div className={`${compact ? "mb-1.5" : "mb-1"} inline-block rounded-sm px-2 py-0.5 text-xs font-semibold teal`} style={{ background: "rgba(14,73,77,0.08)" }}>{vehicle}</div> : null}
+        {compact ? null : <div className="text-xs text-gray-500">{t.cat}{tag ? <span className="ml-2 rounded-sm px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide" style={{ background: "#E5FE52", color: "#343D01" }}>{tag}</span> : null}</div>}
         <div className="font-bold text-lg leading-tight">{t.title}</div>
       </div>
       {t.live ? <ChevronRight className="shrink-0 text-blue-700" /> : <span className="shrink-0 rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Coming soon</span>}
@@ -692,7 +714,13 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
     onScroll();
     return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
   }, []);
-  useEffect(() => { tabRefs.current[active]?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }, [active]);
+  // Centre the active tab in its own bar. Scroll the bar, never the window: scrollIntoView would also nudge the
+  // page vertically whenever the bar was partly off screen, which on a long-hero guide happened on first render.
+  useEffect(() => {
+    const el = tabRefs.current[active]; const bar = el && el.parentElement;
+    if (!el || !bar) return;
+    bar.scrollTo({ left: Math.max(0, el.offsetLeft - (bar.clientWidth - el.offsetWidth) / 2), behavior: "smooth" });
+  }, [active]);
 
   const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); // sections carry scroll-margin-top for the two bars
   const diffBar = Array.from({ length: 5 }, (_, i) => <span key={i} className={`h-2 w-5 rounded-sm ${i + 1 <= Math.floor(g.glance.difficulty) ? "bg-blue-700" : i < g.glance.difficulty ? "bg-blue-400" : "bg-gray-300"}`} />);
@@ -716,7 +744,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
           </button>
         ) : null}
       </div>
-      {asking && v ? <VariantModal v={v} onPick={id => { setChoice(id); setAsking(false); onChoice && onChoice(id); }} /> : null}
+      {asking && v ? <VariantModal v={v} onPick={id => { setChoice(id); setAsking(false); onChoice && onChoice(id); toTop(); }} /> : null}
 
       <figure className="relative mt-5 mb-1 px-6">
         <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
@@ -725,7 +753,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
       </figure>
 
       <nav className="wb-tabs -mx-4 mt-5 flex gap-1 overflow-x-auto px-4" aria-label="Contents">
-        {nav.map(([id, l]) => <button key={id} ref={el => (tabRefs.current[id] = el)} onClick={() => jump(id)} aria-current={active===id ? "true" : undefined} className={`shrink-0 rounded-sm px-3 py-1.5 text-sm font-semibold transition-colors ${active===id ? "active-fill" : "bg-white text-gray-700"}`}>{l}</button>)}
+        {nav.map(([id, l]) => <button key={id} ref={el => (tabRefs.current[id] = el)} onClick={() => jump(id)} aria-current={active===id ? "true" : undefined} className={`shrink-0 rounded-sm px-3 py-1.5 text-sm font-semibold transition-colors ${active===id ? "active-fill" : "tab-idle text-gray-700"}`}>{l}</button>)}
       </nav>
 
       <div id="glance"><Lifespan l={g.lifespan} choice={choice} /></div>
@@ -953,9 +981,13 @@ export default function App() {
   const patch = p => setStack(s => [...s.slice(0, -1), { ...s[s.length - 1], ...p }]);
   useEffect(() => {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
-    window.scrollTo(0, 0);
+    toTop();
   }, []);
-  useEffect(() => { window.scrollTo(0, 0); }, [nav.screen, nav.gid]);
+  // Every push or pop is a new screen, including each browse level (which all share screen: "browse"),
+  // so key on the stack depth. Layout effect: the reset lands before the new screen paints, so there is
+  // no flash of the previous scroll position. The follow-up frame covers iOS Safari, which can restore
+  // the old offset after a same-frame DOM swap.
+  useLayoutEffect(() => { toTop(); const r = requestAnimationFrame(toTop); return () => cancelAnimationFrame(r); }, [stack.length, nav.screen, nav.gid]);
   // Loads the vehicle catalog plus the task list for the current vehicle. Guides load one at a time when opened.
   useEffect(() => {
     Promise.all([loadCatalog(), loadTasks()])
