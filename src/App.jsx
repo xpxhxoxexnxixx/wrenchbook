@@ -542,12 +542,92 @@ function HomeScreen({ go, db }) {
   );
 }
 
+/* Category graphics: small multi-colour marks in the app's teals and blues, one step above an icon. Shown beside category titles. */
+const CAT_COL = { deep: "#0F2230", navy: "#0B4664", teal: "#0E494D", mid: "#4F9AA1", light: "#75D3D8", pale: "#F1FAFF" };
+const CatArt = ({ name, size = 48 }) => {
+  const c = CAT_COL;
+  const art = {
+    Engine: (<>
+      <rect x="8" y="18" width="32" height="18" rx="3" fill={c.navy} />
+      <rect x="11" y="12" width="26" height="8" rx="2" fill={c.teal} />
+      {[15, 21, 27, 33].map(x => <rect key={x} x={x} y="8" width="3" height="5" rx="1" fill={c.light} />)}
+      {[13, 20, 27, 34].map(x => <rect key={x} x={x} y="22" width="4" height="10" rx="1" fill={c.mid} />)}
+      <circle cx="40" cy="30" r="5" fill={c.mid} stroke={c.deep} strokeWidth="1.5" />
+      <circle cx="40" cy="30" r="1.8" fill={c.pale} />
+      <path d="M6 30 h-3 v6 h6" fill="none" stroke={c.deep} strokeWidth="2" strokeLinecap="round" />
+      <rect x="4" y="36" width="40" height="4" rx="2" fill={c.deep} />
+    </>),
+    "Forced induction": (<>
+      <path d="M28 12 h9 q5 0 5 5 v8" fill="none" stroke={c.mid} strokeWidth="4" strokeLinecap="round" />
+      <rect x="38" y="25" width="8" height="5" rx="1.5" fill={c.teal} />
+      <rect x="2" y="21" width="7" height="10" rx="1.5" fill={c.teal} />
+      <circle cx="22" cy="26" r="16" fill={c.navy} />
+      <circle cx="22" cy="26" r="10.5" fill={c.mid} />
+      {[0, 60, 120, 180, 240, 300].map(a => <path key={a} d="M22 26 l3 -9 q-3 -1 -6 0 z" fill={c.light} transform={`rotate(${a} 22 26)`} />)}
+      <circle cx="22" cy="26" r="3.2" fill={c.pale} />
+      <circle cx="22" cy="26" r="1.4" fill={c.deep} />
+      <rect x="10" y="40" width="24" height="4" rx="2" fill={c.deep} />
+    </>),
+    Suspension: (<>
+      <rect x="21" y="4" width="6" height="40" rx="2" fill={c.navy} />
+      <path d="M14 10 l20 4 l-20 4 l20 4 l-20 4 l20 4 l-20 4 l20 4" fill="none" stroke={c.light} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="16" y="2" width="16" height="5" rx="2" fill={c.teal} />
+      <path d="M24 40 L40 44" stroke={c.mid} strokeWidth="4" strokeLinecap="round" />
+      <circle cx="41" cy="44" r="3" fill={c.deep} />
+      <circle cx="24" cy="42" r="4" fill={c.deep} />
+    </>),
+    Brakes: (<>
+      <circle cx="22" cy="26" r="18" fill={c.mid} />
+      <circle cx="22" cy="26" r="12" fill={c.light} />
+      <circle cx="22" cy="26" r="5" fill={c.navy} />
+      {[0, 60, 120, 180, 240, 300].map(a => <circle key={a} cx={22 + 8.5 * Math.cos(a * Math.PI / 180)} cy={26 + 8.5 * Math.sin(a * Math.PI / 180)} r="1.6" fill={c.teal} />)}
+      <path d="M34 10 a20 20 0 0 1 8 16 l-6 1 a14 14 0 0 0 -6 -12 z" fill={c.deep} />
+      <rect x="36" y="14" width="5" height="4" rx="1" fill={c.pale} />
+    </>),
+    Drivetrain: (<>
+      <circle cx="16" cy="24" r="11" fill={c.navy} />
+      {[0, 45, 90, 135, 180, 225, 270, 315].map(a => <rect key={a} x="14" y="9" width="4" height="6" rx="1" fill={c.navy} transform={`rotate(${a} 16 24)`} />)}
+      <circle cx="16" cy="24" r="5" fill={c.light} />
+      <circle cx="33" cy="30" r="8" fill={c.mid} />
+      {[0, 60, 120, 180, 240, 300].map(a => <rect key={a} x="31.5" y="19" width="3" height="5" rx="1" fill={c.mid} transform={`rotate(${a} 33 30)`} />)}
+      <circle cx="33" cy="30" r="3.5" fill={c.pale} />
+      <path d="M33 38 v6 M27 44 h12" stroke={c.deep} strokeWidth="2.5" strokeLinecap="round" />
+    </>),
+    Electrical: (<>
+      <rect x="6" y="16" width="28" height="22" rx="3" fill={c.navy} />
+      <rect x="10" y="12" width="6" height="5" rx="1" fill={c.teal} />
+      <rect x="24" y="12" width="6" height="5" rx="1" fill={c.teal} />
+      <path d="M22 18 l-7 11 h6 l-3 9 l9 -12 h-6 l3 -8 z" fill={c.light} />
+      <path d="M34 22 h6 q4 0 4 4 v6" fill="none" stroke={c.mid} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="44" cy="35" r="3" fill={c.pale} stroke={c.mid} strokeWidth="2" />
+    </>),
+    Exterior: (<>
+      <path d="M4 32 l4 -8 h8 l6 -7 h12 l8 7 h4 v8 z" fill={c.navy} />
+      <path d="M17 24 l5 -6 h10 l6 6 z" fill={c.light} />
+      <rect x="4" y="30" width="42" height="4" rx="2" fill={c.deep} />
+      <circle cx="14" cy="34" r="5" fill={c.deep} /><circle cx="14" cy="34" r="2.2" fill={c.pale} />
+      <circle cx="36" cy="34" r="5" fill={c.deep} /><circle cx="36" cy="34" r="2.2" fill={c.pale} />
+      <rect x="42" y="26" width="4" height="3" rx="1" fill={c.mid} />
+    </>),
+    Interior: (<>
+      <path d="M12 8 q-4 0 -4 4 v16 q0 4 4 4 h8 v-24 z" fill={c.navy} />
+      <path d="M10 32 h12 l4 8 h-20 z" fill={c.teal} />
+      <rect x="6" y="40" width="22" height="3" rx="1.5" fill={c.deep} />
+      <circle cx="36" cy="24" r="9" fill="none" stroke={c.mid} strokeWidth="3" />
+      <circle cx="36" cy="24" r="2.5" fill={c.light} />
+      <path d="M36 26.5 v6 M27.5 22 h5 M39.5 22 h5" stroke={c.mid} strokeWidth="2.5" strokeLinecap="round" />
+    </>),
+  }[name];
+  if (!art) return null;
+  return <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className="shrink-0">{art}</svg>;
+};
+
 function Browse({ nav, go, back, db }) {
   const { brand, model, gen, pt, cat } = nav;
   const range = g => `${g.from}–${g.to || "present"}`;
-  const Row = ({ title, sub, subAbove, live, onClick }) => (
+  const Row = ({ title, sub, subAbove, live, onClick, art }) => (
     <button disabled={!live} onClick={onClick} className={`card flex w-full items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${live ? "" : "opacity-50"}`}>
-      <div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div>
+      <div className="flex items-center gap-3">{art || null}<div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div></div>
       {live ? <ChevronRight size={18} className="text-blue-700" /> : <span className="rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Soon</span>}
     </button>
   );
@@ -555,11 +635,14 @@ function Browse({ nav, go, back, db }) {
   if (!model) { title = brand.name; backLabel = "Home"; list = db.models[brand.id].map(m => <Row key={m.id} title={m.name} live={m.live} onClick={() => go({ ...nav, model: m })} />); }
   else if (!gen) { title = `${brand.name} ${model.name}`; backLabel = "Models"; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => go({ ...nav, gen: g })} />); }
   else if (!pt) { title = `${model.name} ${gen.name} · ${range(gen)}`; backLabel = "Model years"; list = (db.powertrains[gen.id] || []).map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
-  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = "Engines"; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} onClick={() => go({ ...nav, cat: c })} />; }); }
+  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = "Engines"; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} onClick={() => go({ ...nav, cat: c })} />; }); }
   else { title = cat; backLabel = `${pt.name} categories`; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
   return (
     <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel}>
-      <h1 className="wide font-black text-3xl tracking-tight pt-4 pb-4">{title}</h1>
+      <div className="flex items-center gap-3 pt-4 pb-4">
+        {cat ? <CatArt name={cat} size={52} /> : null}
+        <h1 className="wide font-black text-3xl tracking-tight">{title}</h1>
+      </div>
       <div className="space-y-2">{list}</div>
     </Frame>
   );
