@@ -635,6 +635,15 @@ const CatArt = ({ name, size = 48 }) => {
       <circle cx="36" cy="34" r="5" fill={c.deep} /><circle cx="36" cy="34" r="2.2" fill={c.pale} />
       <rect x="42" y="26" width="4" height="3" rx="1" fill={c.mid} />
     </>),
+    Steering: (<>
+      <circle cx="24" cy="26" r="17" fill="none" stroke={c.navy} strokeWidth="4.5" />
+      <circle cx="24" cy="26" r="4.5" fill={c.navy} />
+      <path d="M24 30 v10" stroke={c.navy} strokeWidth="4" strokeLinecap="round" />
+      <path d="M20.5 26 l-11.5 -4" stroke={c.navy} strokeWidth="4" strokeLinecap="round" />
+      <path d="M27.5 26 l11.5 -4" stroke={c.navy} strokeWidth="4" strokeLinecap="round" />
+      <circle cx="24" cy="26" r="1.6" fill={c.pale} />
+      <rect x="20" y="6" width="8" height="4" rx="1" fill={c.teal} />
+    </>),
     Interior: (<>
       <path d="M12 8 q-4 0 -4 4 v16 q0 4 4 4 h8 v-24 z" fill={c.navy} />
       <path d="M10 32 h12 l4 8 h-20 z" fill={c.teal} />
