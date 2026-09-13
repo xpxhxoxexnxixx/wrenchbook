@@ -519,7 +519,7 @@ b+=L("M388 130 H470")+LBL(474,127,["propshaft","centre support bearing"])
 b+=L("M424 210 H470")+LBL(474,207,["Haldex oil + filter","G 055 175 A2 · 0.65 L"],"start",GOLD)
 b+=L("M434 258 V290 H470")+LBL(474,293,["rear diff: gear oil","G 052 145 S2 · ~0.95 L"])
 b+=L("M336 246 V120 H300")+LBL(296,117,["plugs: drain 8mm hex · 30 Nm","fill 5mm hex · 15 Nm · open the fill first"],"end")
-build("haldex-hero",330,"Plan view of the 4Motion drivetrain: bevel box on the transmission, propshaft, Haldex coupling, rear differential, with the three oils and plug torques",b,"Three units, two oils. Never put gear oil in the Haldex or Haldex oil in the differential.")
+build("r32-haldex",330,"Plan view of the 4Motion drivetrain: bevel box on the transmission, propshaft, Haldex coupling, rear differential, with the three oils and plug torques",b,"Three units, two oils. Never put gear oil in the Haldex or Haldex oil in the differential.")
 
 json.dump(OUT,open('svgs.json','w'))
 import xml.etree.ElementTree as ET
@@ -527,3 +527,192 @@ for k,v in OUT.items():
     try: ET.fromstring(v)
     except ET.ParseError as e: ISSUES.append(f"XML {k}: {e}")
 print("\n".join(ISSUES) if ISSUES else "checker: clean (incl. haldex)")
+
+# ---------- rsbhero-r32: rear of a 4Motion car from underneath
+reset(); b=""
+b+=T(300,14,"looking up from under the rear of an R32 (front of car is up)",10,700,"middle",TEAL)
+b+=R(120,40,360,40,METAL,4)+T(200,65,"Rear subframe",12,700,"middle",WHITE)
+b+=R(70,60,26,140,STEEL,4)+R(504,60,26,140,STEEL,4)
+b+=T(83,216,"trailing arm",9,600,"middle",TEAL)+T(517,216,"trailing arm",9,600,"middle",TEAL)
+b+=R(294,24,12,56,STEEL,0,INK,1.5)
+b+=R(268,80,64,34,DARK,8)+T(300,101,"HALDEX",9,800,"middle",WHITE)
+b+=R(256,114,88,40,"#4A4F58",8)+T(300,138,"differential",9,700,"middle",WHITE)
+b+=P("M256 134 H110 M344 134 H490",STEEL,10)
+b+=C(110,134,10,DARK,INK,1.5)+C(490,134,10,DARK,INK,1.5)
+b+=P("M350 80 V236","#C9CCD1",7)
+path="M110 176 L130 176 Q140 176 145 158 L150 146 L205 146 Q225 146 225 166 L232 176 L368 176 L375 166 Q375 146 395 146 L450 146 L455 158 Q460 176 470 176 L490 176"
+b+=P(path,BAR,12)
+b+=R(178,150,30,26,INK,3)+R(392,150,30,26,INK,3)
+b+=P("M106 176 L90 140",INK,6)+P("M494 176 L510 140",INK,6)
+b+=L("M306 34 H340")+LBL(344,37,["propshaft from the front"],"start")
+b+=L("M193 176 V236 H154")+LBL(150,239,["Bracket + bushing","2 bolts, 10mm triple-square"],"end")
+b+=L("M300 154 V244 H330")+LBL(334,247,["differential + Haldex sit where","the GTI bar would rotate through"],"start",GOLD)
+b+=L("M410 134 V96 H450")+LBL(454,93,["halfshaft to each hub","stays connected"],"start")
+b+=L("M448 176 V276 H460")+LBL(464,279,["End link (same as GTI)"],"start")
+b+=L("M300 176 V186 H260")+LBL(256,189,["4Motion bar"],"end",BAR)
+b+=T(356,232,"exhaust",8,500,"start","#8A8F98")
+build("r32-rear-sway-bar",310,"View from under the rear of a 4Motion car: propshaft into the Haldex coupling and differential in the centre of the subframe, a halfshaft to each hub, the sway bar arcing under them in two brackets with an end link to each trailing arm",b,"The bar arcs around the differential. It comes out sideways around it, not through the middle.")
+
+json.dump(OUT,open('svgs.json','w'))
+import xml.etree.ElementTree as ET
+for k,v in OUT.items():
+    try: ET.fromstring(v)
+    except ET.ParseError as e: ISSUES.append(f"XML {k}: {e}")
+print("\n".join(ISSUES) if ISSUES else "checker: clean (incl. rsbhero-r32)")
+
+# ---------- vr6-top-hero: what's under the intake manifold
+reset(); b=""
+b+=T(300,18,"top of the VR6 with the intake manifold removed (front of car to the left)",10,700,"middle",TEAL)
+b+=R(60,120,480,90,METAL,10)+T(300,168,"cylinder head",11,700,"middle",WHITE)
+b+=R(90,70,420,50,DARK,8)+T(300,98,"valve cover",11,700,"middle",WHITE)
+for x in range(120,500,64): b+=C(x,120,7,STEEL,INK,1.5)
+b+=R(96,78,46,34,BRASS,6,INK,1.5)+T(119,99,"sep.",8,800,"middle",WHITE)
+b+=P("M180 70 Q200 56 260 56",INK,7)
+b+=R(60,214,480,12,"#B5B9C0",3,INK,1)
+b+=L("M119 78 V44 H140")+LBL(144,41,["oil separator (PCV) · 5× T20, in the cover"],"start",BRASS)
+b+=L("M260 56 H300")+LBL(304,59,["breather hose → intake duct"])
+b+=L("M440 70 V54 H470")+LBL(474,51,["11 cover bolts","10 Nm, middle-out"])
+b+=L("M376 120 V240 H400")+LBL(404,243,["6 coil / plug wells","rag them at once"])
+b+=L("M120 214 V236 H150")+LBL(154,239,["manifold face on the head","9 bolts · 13 Nm"],"start")
+build("r32-vr6-top",282,"Top of the VR6 with the intake manifold removed: valve cover with the oil separator set into its front, breather hose, six plug wells, and the manifold's mating face on the head",b,"Nose in service position first. Every R32 engine-top write-up does it.")
+
+# ---------- crackpipe-hero: coolant pipe run
+reset(); b=""
+b+=T(300,18,"looking down at the head with the manifold off (front of car to the left)",10,700,"middle",TEAL)
+b+=R(60,110,480,90,METAL,10)+T(300,190,"cylinder head",10,700,"middle",WHITE)
+b+=R(440,60,70,50,DARK,8)+T(475,88,"water pump",8,700,"middle",WHITE)
+b+=R(70,60,80,56,STEEL,8,INK,1.5)+T(110,84,"thermostat",8,700,"middle")+T(110,98,"housing",8,700,"middle")
+b+=P("M150 90 H440",INK,14)+P("M150 90 H440",BRASS,9)
+b+=C(150,90,7,YEL,INK,1.5)+C(440,90,7,YEL,INK,1.5)
+b+=R(96,116,28,14,BAR,3,INK,1)
+b+=L("M295 83 V44 H330")+LBL(334,47,["coolant distribution pipe ('crack pipe')","022 121 050 · billet aluminium replacements exist"],"start",BRASS)
+b+=L("M150 97 V130 H190")+LBL(194,133,["o-ring joints at both ends","new o-rings, wetted"],"start",GOLD)
+b+=L("M110 60 V36 H140")+LBL(144,39,["housing + thermostat + seals"],"start")
+b+=L("M110 130 V236 H140")+LBL(144,239,["coolant temp sensor (G62) + o-ring"],"start",BAR)
+b+=L("M475 110 V220 H500")+LBL(496,223,["pipe seats in the pump port"],"end")
+build("r32-crackpipe",276,"Coolant distribution pipe running along the top of the VR6 head from the water pump at the back to the thermostat housing at the front, with o-ring joints at both ends and the temperature sensor in the housing",b,"Both plastic parts fail. Replace them together, with new o-rings.")
+
+# ---------- vr6-chain-hero: two chains at the back of the engine
+reset(); b=""
+b+=T(200,18,"back of the VR6, covers removed",10,700,"middle",TEAL)
+b+=C(220,70,30,METAL)+C(220,70,6,INK,INK,0)+T(220,74,"IN",8,800,"middle",WHITE)
+b+=C(320,70,30,METAL)+C(320,70,6,INK,INK,0)+T(320,74,"EX",8,800,"middle",WHITE)
+b+=C(270,160,22,METAL)+C(270,160,5,INK,INK,0)+T(240,164,"intermediate shaft",9,600,"end")
+b+=C(270,250,28,METAL)+C(270,250,6,INK,INK,0)+T(270,292,"crank",9,600,"middle")
+b+=P("M192 78 L250 150 M348 78 L290 150 M220 40 H320",INK,6)
+b+=P("M252 172 L252 234 M288 172 L288 234",INK,6)
+b+=P("M196 96 L240 140",DARK,10)+P("M344 96 L304 140",YEL,10)
+b+=P("M250 180 V226",YEL,8)+P("M290 180 V226",DARK,8)
+b+=L("M200 100 H150")+LBL(146,97,["upper guide rail (fixed)","plastic wears"],"end")
+b+=L("M340 100 H400")+LBL(404,97,["upper tensioner rail","+ 27mm tensioner bolt"],"start",GOLD)
+b+=L("M250 203 H150")+LBL(146,200,["lower tensioner rail","spring type"],"end",GOLD)
+b+=L("M290 203 H400")+LBL(404,200,["lower guide rail (fixed)"],"start")
+b+=L("M270 32 V22 H400")+LBL(404,25,["cam locks go here (24V tool)"],"start",BAR)
+b+=L("M298 250 H400")+LBL(404,253,["rear main seal","behind the crank sprocket"],"start")
+build("r32-vr6-chains",326,"Rear of the VR6: upper chain from both cams to the intermediate shaft, lower chain from the intermediate shaft to the crank, each with a fixed guide rail and a tensioner rail",b,"Chains rarely wear. The plastic rails do. Buy the whole 24V kit.")
+
+# ---------- r32-exhaust-hero: underside of the R32
+reset(); b=""
+b+=T(60,20,"FRONT →",10,700,"start",TEAL)
+b+=R(30,40,540,190,PALE,10,INK,1.5)
+b+=R(160,50,12,170,STEEL,0,INK,1)+T(166,240,"cross brace (4× 13mm)",8,600,"middle",TEAL)
+b+=P("M70 130 H150",INK,14)+P("M70 130 H150",STEEL,9)
+b+=R(90,120,40,20,BRASS,4,INK,1.5)+T(110,134,"cats",7,800,"middle",WHITE)
+b+=R(150,122,16,16,INK,2,INK,0)
+b+=P("M166 130 H420 Q440 130 440 150 V180",INK,12)+P("M166 130 H420 Q440 130 440 150 V180",STEEL,8)
+b+=P("M200 100 H500",DARK,8)+T(350,92,"propshaft",8,600,"middle","#F1FAFF")
+b+=R(400,180,90,34,METAL,8)+T(445,201,"muffler",9,700,"middle",WHITE)
+b+=P("M445 214 L430 228 M445 214 L460 228",INK,8)
+b+=R(470,166,16,12,YEL,2,INK,1)
+for (x,y) in [(230,130),(330,130)]: b+=P(f"M{x} {y-8} l-3 -12",INK,2)+C(x-3,y-22,4,YEL,INK,1.5)
+b+=L("M158 130 V60 H190")+LBL(194,63,["60mm sleeve clamp: downpipe ↔ cat-back"],"start")
+b+=L("M478 166 V148 H500")+LBL(504,151,["flapper"],"start",GOLD)
+b+=L("M420 100 V72 H440")+LBL(444,75,["propshaft clearance"],"start")
+b+=T(300,258,"2 front hangers (yellow) · muffler hangers bolt to the body · tips centred in the valance",9,600,"middle",TEAL)
+build("r32-exhaust",272,"Underside plan of the R32 exhaust: downpipe with two cats ahead of the cross brace, a single sleeve joint into the cat-back, mid-pipe beside the propshaft, centre-exit muffler with the vacuum flapper",b)
+
+json.dump(OUT,open('svgs.json','w'))
+import xml.etree.ElementTree as ET
+for k,v in OUT.items():
+    try: ET.fromstring(v)
+    except ET.ParseError as e: ISSUES.append(f"XML {k}: {e}")
+print("\n".join(ISSUES) if ISSUES else "checker: clean (incl. R32 engine drawings)")
+
+# ---------- turbo-kit-hero: schematic of a single-turbo VR6 (not a recreation of any kit's photos)
+reset(); b=""
+b+=T(300,18,"schematic · exhaust side up (firewall), intake side down",9,700,"middle",TEAL)
+b+=R(180,140,240,60,METAL,10)+T(300,168,"3.2 VR6",12,800,"middle",WHITE)+T(300,184,"head + spacer (compression drop)",8,500,"middle","#F1FAFF")
+b+=R(180,114,240,26,DARK,6)+T(300,131,"kit cast exhaust manifold · O2 bungs kept in place",8,600,"middle","#F1FAFF")
+b+=C(480,110,30,DARK,INK,2)+C(480,110,14,STEEL,INK,1.5)+T(480,114,"turbo",7,800,"middle",INK)
+b+=P("M420 127 H450",INK,10)
+b+=P("M510 110 H550 V226",INK,10)+P("M510 110 H550 V226",STEEL,6)
+b+=P("M480 80 V40 H130 V60",BAR,8)
+b+=R(90,60,80,26,"#4F9AA1",6,INK,1.5)+T(130,77,"intercooler",7,700,"middle",WHITE)
+b+=P("M130 86 V160 H180",BAR,8)
+b+=R(60,150,40,16,YEL,3,INK,1)+T(80,161,"inj.",7,800,"middle","#1B1300")
+b+=P("M455 92 L440 76 M462 132 L452 150",BRASS,3)
+b+=P("M540 40 H480",'#7FA6E6',6)
+b+=L("M550 226 V240 H500")+LBL(496,243,["downpipe → your cat-back"],"end")
+b+=T(560,32,"air in",8,700,"middle",BAR)
+b+=L("M170 73 H200")+LBL(204,70,["charge air, cooled","034: front-mount · HPA FT: liquid-cooled manifold"],"start","#4F9AA1")
+b+=L("M80 166 V240 H100")+LBL(104,243,["injectors + FPR + software"],"start",GOLD)
+b+=L("M452 150 V214 H430")+LBL(426,217,["oil feed + coolant","return never uphill"],"end",BRASS)
+build("r32-turbo-kit",278,"Schematic of a single-turbo VR6 as the complete kits build it: kit exhaust manifold into the turbo, downpipe out, compressed air through an intercooler to the intake, injectors and software sized to match, oil and coolant lines to the turbo",b,"In the box: what's drawn. Not in the box: head gasket set, DSG software, plugs, gauges, cat-back.")
+
+json.dump(OUT,open('svgs.json','w'))
+import xml.etree.ElementTree as ET
+for k,v in OUT.items():
+    try: ET.fromstring(v)
+    except ET.ParseError as e: ISSUES.append(f"XML {k}: {e}")
+print("\n".join(ISSUES) if ISSUES else "checker: clean (incl. turbo schematic)")
+
+# ---------- waterpump-mk7: Gen 3 module on the front of the block, under the manifold
+reset(); b=""
+b+=T(300,18,"front of the Gen 3 block with the intake manifold removed (radiator side)",10,700,"middle",TEAL)
+b+=R(60,60,480,150,METAL,10)+T(80,78,"block, front face",9,600,"start",WHITE)
+b+=R(60,40,480,20,STEEL,4)+T(300,54,"manifold face on the head (8× T30 + 2× 10mm · 9 Nm)",8,600,"middle")
+b+=R(230,90,150,90,DARK,10)+T(305,126,"pump + thermostat",10,800,"middle",WHITE)+T(305,142,"one module",8,500,"middle","#F1FAFF")
+for (x,y) in [(240,100),(370,100),(240,170),(370,170),(305,176)]: b+=C(x,y,4,YEL,INK,1)
+b+=C(160,150,22,STEEL)+C(160,150,6,INK,INK,0)+P("M180 138 L232 118 M180 162 L232 172",INK,5)
+b+=R(140,86,90,14,"#B5B9C0",3,INK,1)+T(185,97,"belt cover · 2× T30",7,600,"middle")
+b+=R(380,110,30,14,BRASS,3,INK,1.5)+R(380,150,30,14,BRASS,3,INK,1.5)
+b+=R(410,112,60,10,STEEL,2,INK,1)+R(410,152,60,10,STEEL,2,INK,1)
+b+=R(280,180,50,12,BAR,3,BAR,0)
+b+=L("M370 174 V230 H400")+LBL(404,233,["5 captive T30 · 8 Nm","lower two need a mirror"])
+b+=L("M160 172 V230 H60")+LBL(60,243,["belt from the balance-shaft pulley","walk it on while turning the crank (24mm)"],"start")
+b+=L("M470 117 H500 V96")+LBL(500,90,["coolant lines: pull the clips","with a pick"],"middle")
+b+=L("M300 192 V262 H330")+LBL(334,265,["connector underneath (safety tab)"],"start",BAR)
+build("mk7-waterpump",292,"Front of the EA888 Gen 3 block with the intake manifold removed: the water pump and thermostat housing as one module on five captive screws, driven by a belt from the balance-shaft pulley, with two clipped coolant lines and a connector underneath",b,"Everything above this drawing has to come off first. The pump itself is the easy part.")
+
+json.dump(OUT,open('svgs.json','w'))
+import xml.etree.ElementTree as ET
+for k,v in OUT.items():
+    try: ET.fromstring(v)
+    except ET.ParseError as e: ISSUES.append(f"XML {k}: {e}")
+print("\n".join(ISSUES) if ISSUES else "checker: clean (incl. waterpump-mk7)")
+
+# ---------- intake-mk7-hero: schematic of a full-replacement MQB intake
+reset(); b=""
+b+=T(300,18,"schematic · front-left of the Mk7 bay, looking down (radiator at the top)",9,700,"middle",TEAL)
+b+=R(60,36,480,14,STEEL,4)+T(300,47,"radiator support",8,600,"middle")
+b+=P("M90 60 H260 V170 H90 Z",INK,2,"#4F9AA1")+T(175,86,"heat shield",9,700,"middle",WHITE)
+b+=C(175,128,26,STEEL,INK,1.5)+C(175,128,10,"#7FA6E6",INK,1)+T(175,170,"5\" cone on the velocity stack",8,600,"middle",WHITE)
+b+=C(120,64,5,INK,INK,0)+C(230,64,5,INK,INK,0)
+b+=P("M260 128 H330 Q360 128 360 158 V180",INK,12)+P("M260 128 H330 Q360 128 360 158 V180",STEEL,8)
+b+=R(268,120,20,16,BAR,3,BAR,0)+R(350,170,20,16,BAR,3,BAR,0)
+b+=C(360,196,16,DARK,INK,1.5)+T(360,200,"turbo",7,700,"middle",WHITE)
+b+=R(300,90,14,10,YEL,2,INK,1)+R(292,102,10,8,GOLD,2,INK,1)
+b+=P("M80 190 H270",BRASS,5)+P("M80 190 H270",'#E3C36A',2)
+b+=L("M120 64 V28 H150")+LBL(154,31,["shield sits on the two factory grommet posts"],"start")
+b+=L("M278 118 V64 H300")+LBL(304,60,["couplers: seat, relax, then clamp (5 Nm)"],"start",BAR)
+b+=L("M307 96 V110 H400")+LBL(404,113,["SAI adapter (GTI) or block-off","+ factory vacuum line on a barb"],"start",GOLD)
+b+=L("M376 196 H400")+LBL(404,199,["turbo inlet","factory or upgraded TIP"],"start")
+b+=L("M120 190 V226 H60")+LBL(60,240,["IE only: factory coolant line rerouted in silicone"],"start",BRASS)
+build("mk7-intake",272,"Schematic of a full-replacement MQB intake: heat-shielded cone filter on the factory airbox posts, pipe and silicone couplers to the turbo inlet, the secondary-air fitting and vacuum line retained, and the coolant line IE's kit reroutes",b,"034 kits keep the factory lower box and skip the coolant line; the rest still applies.")
+
+json.dump(OUT,open('svgs.json','w'))
+import xml.etree.ElementTree as ET
+for k,v in OUT.items():
+    try: ET.fromstring(v)
+    except ET.ParseError as e: ISSUES.append(f"XML {k}: {e}")
+print("\n".join(ISSUES) if ISSUES else "checker: clean (incl. intake-mk7)")

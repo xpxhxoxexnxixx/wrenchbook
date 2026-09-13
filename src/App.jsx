@@ -16,6 +16,12 @@ const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 .wb { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color:#1B1F24; background:#FDFDFC; -webkit-font-smoothing:antialiased; }
 .wb * { box-sizing:border-box; }
+/* Sticky header + tab bar. Fixed pixel heights so the two always meet; the tab bar overlaps the header by 1px so no seam shows. */
+.wb .wb-header { position: sticky; top: 0; z-index: 20; height: 52px; background: rgba(253,253,252,0.95); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.wb .wb-header-dark { background: #051824; color: #E6F8F8; }
+.wb .wb-tabs { position: sticky; top: 51px; z-index: 10; padding-top: 9px; padding-bottom: 8px; background: rgba(253,253,252,0.95); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); scrollbar-width: none; }
+.wb .wb-tabs::-webkit-scrollbar { display: none; }
+.wb h2[id], .wb #glance, .wb [id^="step-"] { scroll-margin-top: 104px; }
 .wb .wide { letter-spacing: -0.02em; }
 .wb .narrow { letter-spacing: 0; }
 .teal { color:#0E494D; }
@@ -74,17 +80,14 @@ const CSS = `
 /* ------------------------------------------------------------------ */
 
 /* Variant visibility: any item may carry `only: ["optionId", ...]`. Items without `only` show for everyone. */
-/* `choice` is one option id (single question) or an array of ids (one per question). An `only` entry may be a single id or
-   an "a+b" combination that needs every listed id chosen. Items with no `only` show for everyone. */
-const chosenIds = choice => new Set(Array.isArray(choice) ? choice : choice ? [choice] : []);
-const vis = (item, choice) => { if (!item || !item.only || !choice) return true; const c = chosenIds(choice); return item.only.some(e => String(e).split("+").every(id => c.has(id))); };
+const vis = (item, choice) => !item || !item.only || !choice || item.only.includes(choice);
 const txt = item => (typeof item === "string" ? item : item.text);
 
-const VariantModal = ({ v, onPick, step }) => (
+const VariantModal = ({ v, onPick }) => (
   <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-labelledby="variant-q">
     <div className="absolute inset-0 bg-white/40 backdrop-blur-xl" />
     <div className="relative m-3 w-full max-w-[480px] rounded-md p-5 shadow-2xl" style={{ background: "#FDFDFC" }}>
-      <div className="text-xs text-gray-500">Before you start{step ? ` · question ${step}` : ""}</div>
+      <div className="text-xs text-gray-500">Before you start</div>
       <h2 id="variant-q" className="wide font-black text-2xl leading-tight mt-1">{v.question}</h2>
       {v.hint ? <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">{v.hint}</p> : null}
       <div className="mt-4 grid gap-2">
@@ -262,6 +265,7 @@ const Block = ({ b, choice }) => {
     case "torque": return <Torque b={b} />;
     case "ill": return <Art id={b.id} cap={b.cap} />;
     case "embed": return <Video id={b.id} note={b.note} title={b.title} />;
+    case "chart": return <BarChart c={b} />;
     case "fork": return <Fork b={b} choice={choice} />;
     case "conf": return <div className="my-3"><Dots c={b.c} /></div>;
     default: return null;
@@ -350,16 +354,56 @@ const Splash = ({ onDone }) => {
   );
 };
 
-const Frame = ({ children, onHome, crumbs, onBack, onClose, dark, anim }) => (
+/** A guide whose pre-question is a brand/kit choice hides its "Aftermarket options" once a specific brand is chosen: the user already picked.
+ *  Options flagged `brand: true` are specific products; an "other" option leaves the list visible. */
+const showAftermarket = (g, choice) => {
+  if (!g.aftermarket || !g.aftermarket.length) return false;
+  const opt = g.variants && g.variants.options.find(o => o.id === choice);
+  return !(opt && opt.brand);
+};
+
+/** Horizontal bar chart for a guide body block: { title, unit, baseline, bars: [{label, v, note}], source, c }. Baseline (the stock figure) is drawn grey. */
+const BarChart = ({ c }) => {
+  const max = Math.max(...c.bars.map(x => x.v)) * 1.08;
+  return (
+    <figure className="card my-5 rounded-sm bg-white p-4 shadow-sm">
+      {c.title ? <figcaption className="mb-3 text-xs font-bold uppercase tracking-wide" style={{ color: "#0E494D" }}>{c.title}</figcaption> : null}
+      <div className="space-y-2">
+        {c.bars.map((x, i) => {
+          const base = x.label === c.baseline;
+          return (
+            <div key={i} className="grid items-center gap-2" style={{ gridTemplateColumns: "34% 1fr" }}>
+              <div className="truncate text-[13px] font-semibold leading-tight" style={{ color: base ? "#6B7078" : "#0F2230" }}>{x.label}{x.note ? <span className="block text-[11px] font-normal text-gray-500">{x.note}</span> : null}</div>
+              <div className="relative h-6 rounded-sm bg-gray-100">
+                <div className="h-6 rounded-sm" style={{ width: `${Math.max(4, (x.v / max) * 100)}%`, background: base ? "#B7B7B4" : "#0B4664" }} />
+                <div className="absolute inset-y-0 flex items-center text-[12px] font-bold tabular-nums" style={{ left: `calc(${Math.min(84, (x.v / max) * 100)}% + 6px)`, color: base ? "#6B7078" : "#0F2230" }}>{x.v}{c.unit ? ` ${c.unit}` : ""}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {c.source ? <div className="mt-3 text-[11px] text-gray-500">{c.source}</div> : null}
+      {c.c ? <div className="mt-3"><Dots c={c.c} /></div> : null}
+    </figure>
+  );
+};
+
+const Frame = ({ children, onHome, onBack, backLabel, onClose, dark, anim, title }) => (
   <div className={`wb relative min-h-screen ${dark ? "dark" : ""}`}>
     <style>{CSS}</style>
     {dark ? <Lattice /> : null}
     <div className={`relative mx-auto max-w-[520px] min-h-screen ${dark ? "" : "bg-[#FDFDFC]"} ${anim || ""}`}>
-      <header className={`sticky top-0 z-20 flex items-center gap-2 px-4 py-3 ${dark ? "" : "bg-[#FDFDFC]/95 backdrop-blur"}`} style={dark ? { background: "#051824", color: "#E6F8F8" } : undefined}>
-        {onBack ? <button onClick={onBack} className="rounded-sm p-1 -ml-1" aria-label="Back"><ChevronLeft /></button> : null}
-        <button onClick={onHome} className="wide font-black text-lg tracking-tight">Top Dead Center</button>
-        {crumbs ? <div className="ml-auto truncate text-xs text-gray-500">{crumbs}</div> : null}
-        {onClose ? <button onClick={onClose} aria-label="Close" className="ml-auto -mr-1 flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-gray-700 shadow-sm"><X size={20} /></button> : null}
+      <header className={`wb-header flex items-center px-4 ${dark ? "wb-header-dark" : ""}`}>
+        <div className="flex w-full items-center gap-2">
+          {title ? <div className="wide font-black text-lg tracking-tight">{title}</div> : null}
+          {onBack ? (
+            <button onClick={onBack} className={`-ml-1 flex items-center gap-1 rounded-sm px-1 py-1 text-[15px] font-semibold ${dark ? "text-[#E6F8F8]" : ""}`} style={dark ? undefined : { color: "#0B4664" }} aria-label={backLabel ? `Back to ${backLabel}` : "Back"}>
+              <ChevronLeft size={20} />
+              <span className="truncate">{backLabel || "Back"}</span>
+            </button>
+          ) : null}
+          {onClose ? <button onClick={onClose} aria-label="Close" className="ml-auto -mr-1 flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-gray-700 shadow-sm"><X size={20} /></button> : null}
+        </div>
       </header>
       <main className="relative px-4 pb-24">{children}</main>
     </div>
@@ -385,12 +429,11 @@ const TaskCard = ({ t, onOpen, vehicle, compact, tag }) => (
   </button>
 );
 
-/** "2006–2009" · "2022–present" · "2008" when a generation is a single model year */
-const yearRange = g => (g.to && g.to !== g.from) || !g.to ? `${g.from}–${g.to || "present"}` : `${g.from}`;
-
-/** Human label for the car(s) a task fits, derived from the catalog: "2006–2009 Volkswagen GTI · FSI & TSI". */
+/** Human label for the car(s) a task fits, derived from the catalog: "2006 Volkswagen GTI · 2.0T FSI". */
+/** Label for a guide card: every car the guide's tasks cover, e.g. "2006–2009 Volkswagen GTI +1 more · FSI & TSI". `powertrainId` may be one id or a list. */
 const vehicleLabel = (db, powertrainId, engineOverride) => {
-  const rows = Object.entries(db.powertrains).flatMap(([genId, list]) => list.filter(p => p.id === powertrainId).map(p => ({ ...p, genId })));
+  const ids = Array.isArray(powertrainId) ? powertrainId : [powertrainId];
+  const rows = Object.entries(db.powertrains).flatMap(([genId, list]) => list.filter(p => ids.includes(p.id)).map(p => ({ ...p, genId })));
   if (!rows.length) return null;
   const allGens = Object.entries(db.gens).flatMap(([mid, gs]) => gs.map(g => ({ ...g, model_id: mid })));
   const modelName = mid => Object.values(db.models).flat().find(m => m.id === mid)?.name || mid;
@@ -398,10 +441,10 @@ const vehicleLabel = (db, powertrainId, engineOverride) => {
   const cars = [...new Set(rows.map(r => {
     const g = allGens.find(x => x.id === r.genId);
     if (!g) return null;
-    return [yearRange(g), brandOf(g.model_id)?.name, modelName(g.model_id)].filter(Boolean).join(" ");
+    return [`${g.from}–${g.to || "present"}`, brandOf(g.model_id)?.name, modelName(g.model_id)].filter(Boolean).join(" ");
   }).filter(Boolean))];
   if (!cars.length) return rows[0].name || null;
-  const engine = engineOverride ? engineOverride.replace(/ only$/, "") : allEngines(db, powertrainId);
+  const engine = engineOverride ? engineOverride.replace(/ only$/, "") : allEngines(db, ids[0]);
   return `${cars[0]}${cars.length > 1 ? ` +${cars.length - 1} more` : ""} · ${engine}`;
 };
 
@@ -427,37 +470,10 @@ const dedupeByGuide = tasks => { const seen = new Set(); return tasks.filter(t =
 
 function HomeScreen({ go, db }) {
   const [q, setQ] = useState("");
-  // Search understands a whole sentence: vehicle words (year, make, model) narrow the cars, filler words are ignored, and every
-  // remaining word has to appear somewhere in a guide's title, aliases or group. "spark plug change 2006 VW GTI" works.
   const results = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (s.length < 2) return null;
-    const STOP = new Set(["change","changing","replace","replacing","replacement","install","installing","upgrade","how","to","do","i","a","an","the","my","on","for","and","of","with","fix","swap","guide","diy"]);
-    const brands = db.brands.map(b => ({ id: b.id, names: [b.id, b.name.toLowerCase(), ...(b.id === "vw" ? ["volkswagen"] : [])] }));
-    const models = Object.entries(db.models).flatMap(([bid, ms]) => ms.map(m => ({ id: m.id, brand: bid, names: m.name.toLowerCase().split(/\s*\/\s*/) })));
-    const gens = Object.entries(db.gens).flatMap(([mid, gs]) => gs.map(g => ({ ...g, model_id: mid })));
-    const pts = Object.values(db.powertrains).flat();
-    const words = s.split(/[^a-z0-9.+-]+/).filter(Boolean);
-    let year = null, model = null, brand = null; const terms = [];
-    for (const w of words) {
-      if (/^(19|20)\d\d$/.test(w)) { year = +w; continue; }
-      const bm = brands.find(b => b.names.includes(w)); if (bm) { brand = bm.id; continue; }
-      const mm = models.find(m => m.names.includes(w)); if (mm) { model = mm.id; continue; }
-      if (STOP.has(w)) continue;
-      terms.push(w);
-    }
-    if (!terms.length) return [];
-    const okPt = new Set(pts.filter(p => {
-      const g = gens.find(x => x.id === p.generation_id); if (!g) return false;
-      if (model && g.model_id !== model) return false;
-      if (brand && !(db.models[brand] || []).some(m => m.id === g.model_id)) return false;
-      if (year && !(g.from <= year && (g.to == null || year <= g.to))) return false;
-      return true;
-    }).map(p => p.id));
-    const hay = t => [t.title, ...t.aliases, t.group || ""].join(" ").toLowerCase();
-    const hit = t => { const h = hay(t); return terms.every(w => h.includes(w) || h.includes(w.replace(/s$/, ""))); };
-    const filtered = db.tasks.filter(t => okPt.has(t.powertrainId) && hit(t));
-    return dedupeByGuide(filtered.length ? filtered : db.tasks.filter(hit));
+    return dedupeByGuide(db.tasks.filter(t => t.title.toLowerCase().includes(s) || t.aliases.some(a => a.includes(s)) || (t.group && t.group.includes(s))));
   }, [q]);
   const [showAllRecent, setShowAllRecent] = useState(false);
   const RECENT_DAYS = 14, RECENT_MAX = 5;
@@ -475,9 +491,9 @@ function HomeScreen({ go, db }) {
       </div>
       <label className="flex items-center gap-2 rounded-sm bg-white px-3 py-3 shadow-sm">
         <Search size={20} className="text-gray-500" />
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder='Try "spark plug change 2006 VW GTI"' className="w-full bg-transparent text-[17px] outline-none" />
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Try “sway bar”, “air filter” or “end links”" className="w-full bg-transparent text-[17px] outline-none" />
       </label>
-      <div className="mt-1 text-xs muted">Add a year, make or model to narrow to your car; plain part names work too.</div>
+      <div className="mt-1 text-xs muted">Searching every guide. Browse by make to narrow to your car.</div>
 
       {results ? (
         <div className="mt-5 space-y-3">
@@ -509,7 +525,7 @@ function HomeScreen({ go, db }) {
               <div className="mt-1 text-sm text-gray-600">Everything we have is in the catalog above. Want something specific? Request it below.</div>
             </div>
           ) : null}
-          {(showAllRecent ? recent : recent.slice(0, RECENT_MAX)).map(t => <TaskCard key={t.id} t={t} vehicle={vehicleLabel(db, t.powertrainId, engineTag(db, t))} compact onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />)}
+          {(showAllRecent ? recent : recent.slice(0, RECENT_MAX)).map(t => <TaskCard key={t.id} t={t} vehicle={vehicleLabel(db, db.tasks.filter(x => (x.guideId || x.id) === (t.guideId || t.id)).map(x => x.powertrainId), engineTag(db, t))} compact onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />)}
           {recent.length > RECENT_MAX && !showAllRecent ? (
             <button onClick={() => setShowAllRecent(true)} className="flex w-full items-center justify-center gap-1 rounded-sm bg-white px-4 py-3 text-sm font-semibold teal shadow-sm">View all {recent.length}<ChevronDown size={16} /></button>
           ) : null}</div>
@@ -526,103 +542,24 @@ function HomeScreen({ go, db }) {
   );
 }
 
-
-/* Category graphics: small multi-colour marks in the app's teals and blues, one step above an icon. Shown beside category titles. */
-const CAT_COL = { deep: "#0F2230", navy: "#0B4664", teal: "#0E494D", mid: "#4F9AA1", light: "#75D3D8", pale: "#F1FAFF" };
-const CatArt = ({ name, size = 48 }) => {
-  const c = CAT_COL;
-  const art = {
-    Engine: (<>
-      <rect x="8" y="18" width="32" height="18" rx="3" fill={c.navy} />
-      <rect x="11" y="12" width="26" height="8" rx="2" fill={c.teal} />
-      {[15, 21, 27, 33].map(x => <rect key={x} x={x} y="8" width="3" height="5" rx="1" fill={c.light} />)}
-      {[13, 20, 27, 34].map(x => <rect key={x} x={x} y="22" width="4" height="10" rx="1" fill={c.mid} />)}
-      <circle cx="40" cy="30" r="5" fill={c.mid} stroke={c.deep} strokeWidth="1.5" />
-      <circle cx="40" cy="30" r="1.8" fill={c.pale} />
-      <path d="M6 30 h-3 v6 h6" fill="none" stroke={c.deep} strokeWidth="2" strokeLinecap="round" />
-      <rect x="4" y="36" width="40" height="4" rx="2" fill={c.deep} />
-    </>),
-    Suspension: (<>
-      <rect x="21" y="4" width="6" height="40" rx="2" fill={c.navy} />
-      <path d="M14 10 l20 4 l-20 4 l20 4 l-20 4 l20 4 l-20 4 l20 4" fill="none" stroke={c.light} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="16" y="2" width="16" height="5" rx="2" fill={c.teal} />
-      <path d="M24 40 L40 44" stroke={c.mid} strokeWidth="4" strokeLinecap="round" />
-      <circle cx="41" cy="44" r="3" fill={c.deep} />
-      <circle cx="24" cy="42" r="4" fill={c.deep} />
-    </>),
-    Brakes: (<>
-      <circle cx="22" cy="26" r="18" fill={c.mid} />
-      <circle cx="22" cy="26" r="12" fill={c.light} />
-      <circle cx="22" cy="26" r="5" fill={c.navy} />
-      {[0, 60, 120, 180, 240, 300].map(a => <circle key={a} cx={22 + 8.5 * Math.cos(a * Math.PI / 180)} cy={26 + 8.5 * Math.sin(a * Math.PI / 180)} r="1.6" fill={c.teal} />)}
-      <path d="M34 10 a20 20 0 0 1 8 16 l-6 1 a14 14 0 0 0 -6 -12 z" fill={c.deep} />
-      <rect x="36" y="14" width="5" height="4" rx="1" fill={c.pale} />
-    </>),
-    Drivetrain: (<>
-      <circle cx="16" cy="24" r="11" fill={c.navy} />
-      {[0, 45, 90, 135, 180, 225, 270, 315].map(a => <rect key={a} x="14" y="9" width="4" height="6" rx="1" fill={c.navy} transform={`rotate(${a} 16 24)`} />)}
-      <circle cx="16" cy="24" r="5" fill={c.light} />
-      <circle cx="33" cy="30" r="8" fill={c.mid} />
-      {[0, 60, 120, 180, 240, 300].map(a => <rect key={a} x="31.5" y="19" width="3" height="5" rx="1" fill={c.mid} transform={`rotate(${a} 33 30)`} />)}
-      <circle cx="33" cy="30" r="3.5" fill={c.pale} />
-      <path d="M33 38 v6 M27 44 h12" stroke={c.deep} strokeWidth="2.5" strokeLinecap="round" />
-    </>),
-    Electrical: (<>
-      <rect x="6" y="16" width="28" height="22" rx="3" fill={c.navy} />
-      <rect x="10" y="12" width="6" height="5" rx="1" fill={c.teal} />
-      <rect x="24" y="12" width="6" height="5" rx="1" fill={c.teal} />
-      <path d="M22 18 l-7 11 h6 l-3 9 l9 -12 h-6 l3 -8 z" fill={c.light} />
-      <path d="M34 22 h6 q4 0 4 4 v6" fill="none" stroke={c.mid} strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="44" cy="35" r="3" fill={c.pale} stroke={c.mid} strokeWidth="2" />
-    </>),
-    Exterior: (<>
-      <path d="M4 32 l4 -8 h8 l6 -7 h12 l8 7 h4 v8 z" fill={c.navy} />
-      <path d="M17 24 l5 -6 h10 l6 6 z" fill={c.light} />
-      <rect x="4" y="30" width="42" height="4" rx="2" fill={c.deep} />
-      <circle cx="14" cy="34" r="5" fill={c.deep} /><circle cx="14" cy="34" r="2.2" fill={c.pale} />
-      <circle cx="36" cy="34" r="5" fill={c.deep} /><circle cx="36" cy="34" r="2.2" fill={c.pale} />
-      <rect x="42" y="26" width="4" height="3" rx="1" fill={c.mid} />
-    </>),
-    Interior: (<>
-      <path d="M12 8 q-4 0 -4 4 v16 q0 4 4 4 h8 v-24 z" fill={c.navy} />
-      <path d="M10 32 h12 l4 8 h-20 z" fill={c.teal} />
-      <rect x="6" y="40" width="22" height="3" rx="1.5" fill={c.deep} />
-      <circle cx="36" cy="24" r="9" fill="none" stroke={c.mid} strokeWidth="3" />
-      <circle cx="36" cy="24" r="2.5" fill={c.light} />
-      <path d="M36 26.5 v6 M27.5 22 h5 M39.5 22 h5" stroke={c.mid} strokeWidth="2.5" strokeLinecap="round" />
-    </>),
-  }[name];
-  if (!art) return null;
-  return <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className="shrink-0">{art}</svg>;
-};
-
 function Browse({ nav, go, back, db }) {
   const { brand, model, gen, pt, cat } = nav;
-  const range = yearRange;
-  // A generation with a single engine skips the engine picker and goes straight to categories.
-  const pickGen = g => { const pts = (db.powertrains[g.id] || []).filter(p => p.live); go(pts.length === 1 ? { ...nav, gen: g, pt: pts[0] } : { ...nav, gen: g }); };
-  const Row = ({ title, sub, subAbove, live, onClick, art }) => (
+  const range = g => `${g.from}–${g.to || "present"}`;
+  const Row = ({ title, sub, subAbove, live, onClick }) => (
     <button disabled={!live} onClick={onClick} className={`card flex w-full items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${live ? "" : "opacity-50"}`}>
-      <div className="flex items-center gap-3">{art || null}<div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div></div>
+      <div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div>
       {live ? <ChevronRight size={18} className="text-blue-700" /> : <span className="rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Soon</span>}
     </button>
   );
-  let title, list;
-  if (!model) { title = brand.name; list = db.models[brand.id].map(m => <Row key={m.id} title={m.name} live={m.live} onClick={() => go({ ...nav, model: m })} />); }
-  else if (!gen) { title = `${brand.name} ${model.name}`; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => pickGen(g)} />); }
-  else if (!pt) { title = `${model.name} ${gen.name} · ${range(gen)}`; list = (db.powertrains[gen.id] || []).map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
-  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} onClick={() => go({ ...nav, cat: c })} />; }); }
-  else { title = cat; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
-  // The page title carries the path, so the header shows no crumb. The task list is the one screen whose
-  // title (the category) says nothing about the car, so the vehicle sits above it.
-  const above = cat && pt ? `${model.name} ${gen.name} · ${shortEngine(pt)}` : null;
+  let title, list, backLabel;
+  if (!model) { title = brand.name; backLabel = "Home"; list = db.models[brand.id].map(m => <Row key={m.id} title={m.name} live={m.live} onClick={() => go({ ...nav, model: m })} />); }
+  else if (!gen) { title = `${brand.name} ${model.name}`; backLabel = "Models"; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => go({ ...nav, gen: g })} />); }
+  else if (!pt) { title = `${model.name} ${gen.name} · ${range(gen)}`; backLabel = "Model years"; list = (db.powertrains[gen.id] || []).map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
+  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = "Engines"; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} onClick={() => go({ ...nav, cat: c })} />; }); }
+  else { title = cat; backLabel = `${pt.name} categories`; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
   return (
-    <Frame onHome={() => go({ screen: "home" })} onBack={back}>
-      {above ? <div className="pt-4 text-xs font-bold uppercase tracking-wide teal">{above}</div> : null}
-      <div className={`flex items-center gap-3 ${above ? "pt-1" : "pt-4"} pb-4`}>
-        {cat ? <CatArt name={cat} size={52} /> : null}
-        <h1 className="wide font-black text-3xl tracking-tight">{title}</h1>
-      </div>
+    <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel}>
+      <h1 className="wide font-black text-3xl tracking-tight pt-4 pb-4">{title}</h1>
       <div className="space-y-2">{list}</div>
     </Frame>
   );
@@ -632,36 +569,23 @@ function GuideScreen({ go, back, gid, db, choice: initialChoice, onChoice }) {
   const [g, setG] = useState(null);
   const [loadErr, setLoadErr] = useState(null);
   useEffect(() => { let on = true; loadGuide(gid).then(x => on && setG(x)).catch(e => on && setLoadErr(e.message || String(e))); return () => { on = false; }; }, [gid]);
-  if (loadErr) return <Frame onHome={() => go({ screen: "home" })} onBack={back}><p className="pt-10 text-gray-700">Couldn't load this guide. {loadErr}</p></Frame>;
-  if (!g) return <Frame onHome={() => go({ screen: "home" })} onBack={back}><p className="pt-10 text-gray-500">Loading guide…</p></Frame>;
-  return <GuideBody go={go} back={back} g={g} initialChoice={initialChoice} onChoice={onChoice} />;
+  const backLabel = guideBackLabel(g);
+  if (loadErr) return <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel}><p className="pt-10 text-gray-700">Couldn't load this guide. {loadErr}</p></Frame>;
+  if (!g) return <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel}><p className="pt-10 text-gray-500">Loading guide…</p></Frame>;
+  return <GuideBody go={go} back={back} g={g} initialChoice={initialChoice} onChoice={onChoice} backLabel={backLabel} />;
 }
+/** Label the back button on a guide screen with the category or "Home" — depends on whether we're inside the drill-down. */
+const guideBackLabel = g => (g && g.category) ? g.category : "Home";
 
-function GuideBody({ go, back, g, initialChoice, onChoice }) {
+function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
   const gid = g.id;
   const v = g.variants;
-  // One question ({ question, options }) or several ({ questions: [...] }); the answer is an id or an array of ids.
-  const qs = v ? (v.questions || [v]) : [];
   const [choice, setChoice] = useState(initialChoice || null);
-  const answered = qs.length <= 1 ? (choice ? 1 : 0) : (Array.isArray(choice) ? choice.length : 0);
-  const [asking, setAsking] = useState(qs.length > 0 && answered < qs.length);
+  const [asking, setAsking] = useState(!!v && !initialChoice);
   const [showAM, setShowAM] = useState(false);
-  const chosen = qs.length && answered >= qs.length ? { label: qs.map((q, i) => q.options.find(o => o.id === (qs.length <= 1 ? choice : choice[i]))?.label).filter(Boolean).join(" · ") } : null;
-  const pick = id => {
-    const next = qs.length <= 1 ? id : [...(Array.isArray(choice) ? choice : []), id];
-    setChoice(next);
-    const done = qs.length <= 1 || next.length >= qs.length;
-    if (done) { setAsking(false); onChoice && onChoice(next); }
-  };
-  const reask = () => { setChoice(qs.length <= 1 ? null : []); setAsking(true); };
+  const chosen = v && choice ? v.options.find(o => o.id === choice) : null;
   const [active, setActive] = useState("glance");
-  // Chapters: a long guide can group its steps under `chapters` ([{ id, title, blurb }], steps carry `chapter`). Each chapter with
-  // visible steps gets its own tab and heading; steps still number straight through. Guides without chapters get one "Steps" tab.
-  const visibleSteps = g.steps.filter(x => vis(x, choice));
-  const chapters = (g.chapters || []).filter(c => visibleSteps.some(st => st.chapter === c.id));
-  const stepTabs = chapters.length ? chapters.map(c => [`ch-${c.id}`, c.title]) : [["steps", "Steps"]];
-  const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],...stepTabs,...(g.alsoReplace && g.alsoReplace.length ? [["also","While you're in there"]] : []),["read", g.check.tab],["after","After"],["sources","Sources"]];
-  const navRef = useRef(nav); navRef.current = nav;
+  const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],["steps","Steps"],...(g.alsoReplace && g.alsoReplace.length ? [["also","While you're in there"]] : []),["read", g.check.tab],["after","After"],["sources","Sources"]];
   const tabRefs = useRef({});
 
   // Scrollspy: the active tab is the last section whose top has passed the sticky bars.
@@ -671,7 +595,6 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         const line = 120;
-        const nav = navRef.current;
         let cur = nav[0][0];
         for (const [id] of nav) {
           const el = document.getElementById(id);
@@ -688,9 +611,9 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
   }, []);
   useEffect(() => { tabRefs.current[active]?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }, [active]);
 
-  const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); // sections carry scroll-margin-top for the two bars
   const diffBar = Array.from({ length: 5 }, (_, i) => <span key={i} className={`h-2 w-5 rounded-sm ${i + 1 <= Math.floor(g.glance.difficulty) ? "bg-blue-700" : i < g.glance.difficulty ? "bg-blue-400" : "bg-gray-300"}`} />);
-  const H2 = ({ id, children }) => <h2 id={id} className="wide font-black text-2xl tracking-tight pt-10 pb-3 scroll-mt-24">{children}</h2>;
+  const H2 = ({ id, children }) => <h2 id={id} className="wide font-black text-2xl tracking-tight pt-10 pb-3">{children}</h2>;
   const openKit = () => go({ screen: "kit", guide: g, choice });
   const Glance = ({ label, icon, children, onClick }) => {
     const inner = <>{onClick ? <ChevronRight size={16} className="absolute right-2 top-2 metric" /> : null}<div className="flex items-center gap-1 text-xs text-gray-500">{icon}{label}</div>{children}</>;
@@ -700,17 +623,17 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
   };
 
   return (
-    <Frame onHome={() => go({ screen: "home" })} onBack={back} crumbs={g.fits}>
+    <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel || "Home"}>
       <div className="pt-4">
         <div className="text-sm text-gray-500">{g.category} · {g.fits}</div>
         <h1 className="wide font-black text-[32px] leading-[1.02] tracking-tight mt-1">{g.title}</h1>
         {chosen ? (
-          <button onClick={reask} className="mt-3 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-left text-sm font-semibold text-white" style={{ background: "#0F2230" }}>
-            <span className="flex-1 min-w-0">{chosen.label}</span><span className="inline-flex shrink-0 items-center gap-1"><Repeat size={14} className="text-gray-300" /><span className="text-gray-300 font-normal">change</span></span>
+          <button onClick={() => setAsking(true)} className="mt-3 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm font-semibold text-white" style={{ background: "#0F2230" }}>
+            <span>{chosen.label}</span><Repeat size={14} className="text-gray-300" /><span className="text-gray-300 font-normal">change</span>
           </button>
         ) : null}
       </div>
-      {asking && qs.length ? <VariantModal v={qs[Math.min(answered, qs.length - 1)]} step={qs.length > 1 ? `${answered + 1} of ${qs.length}` : null} onPick={pick} /> : null}
+      {asking && v ? <VariantModal v={v} onPick={id => { setChoice(id); setAsking(false); onChoice && onChoice(id); }} /> : null}
 
       <figure className="relative mt-5 mb-1 px-6">
         <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
@@ -718,11 +641,11 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
         <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute right-0 -bottom-4 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
       </figure>
 
-      <nav className="sticky top-[52px] z-10 -mx-4 mt-5 flex gap-1 overflow-x-auto bg-[#FDFDFC]/95 px-4 py-2 backdrop-blur" aria-label="Contents" style={{ scrollbarWidth: "none" }}>
+      <nav className="wb-tabs -mx-4 mt-5 flex gap-1 overflow-x-auto px-4" aria-label="Contents">
         {nav.map(([id, l]) => <button key={id} ref={el => (tabRefs.current[id] = el)} onClick={() => jump(id)} aria-current={active===id ? "true" : undefined} className={`shrink-0 rounded-sm px-3 py-1.5 text-sm font-semibold transition-colors ${active===id ? "active-fill" : "bg-white text-gray-700"}`}>{l}</button>)}
       </nav>
 
-      <div id="glance" className="scroll-mt-28"><Lifespan l={g.lifespan} choice={choice} /></div>
+      <div id="glance"><Lifespan l={g.lifespan} choice={choice} /></div>
       <div className="mt-5 grid grid-cols-2 gap-2">
         <Glance label="Time" icon={<Clock size={12} />}><div className="wide font-black text-2xl mt-1 metric">{g.glance.timeFirst}</div><div className="text-xs text-gray-500">{g.glance.timeRepeat} once you've done it</div></Glance>
         <Glance label="Difficulty" icon={<Gauge size={12} />}><div className="wide font-black text-2xl mt-1 metric">{g.glance.difficulty}<span className="text-base text-gray-400">/5</span></div><div className="mt-1 flex gap-1">{diffBar}</div></Glance>
@@ -731,7 +654,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       </div>
       <p className="mt-2 text-sm text-gray-600">{txt(g.glance.note)}</p>
       <Art id={g.heroId || (g.kind === "upgrade" ? "rsbhero" : "hero")} cap={g.heroCap} />
-      {(g.embeds || []).filter(e => e.id && vis(e, choice)).map((e, i) => <Video key={e.id} id={e.id} title={i === 0 ? "Watch the whole job" : "Also worth watching"} note={e.note} />)}
+      {g.embeds && g.embeds.length && g.embeds[0].id ? <Video id={g.embeds[0].id} title="Watch the whole job" note={g.embeds[0].note} /> : null}
 
       <H2 id="should">Should you do this?</H2>
       <div className="font-semibold">Yes, if any of these are true</div>
@@ -742,10 +665,10 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
 
       <H2 id="need">What you need</H2>
       <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="max-w-[45%] shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono text-xs leading-snug break-words">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div>{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
       </div>
       <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm px-4 py-3 text-left font-semibold text-white" style={{ background: "#0E494D" }}><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
-      {g.aftermarket && g.aftermarket.length ? (
+      {showAftermarket(g, choice) ? (
         <div className="mt-2 rounded-sm shadow-sm border-2" style={{ borderColor: "#E5FE52", background: "#F3FAE7" }}>
           <button onClick={() => setShowAM(x => !x)} aria-expanded={showAM} className="flex w-full items-center justify-between px-3 py-3 text-left">
             <span className="flex items-center gap-2 font-semibold" style={{ color: "#212700" }}><span className="flex h-7 w-7 items-center justify-center rounded-sm" style={{ background: "#E5FE52" }}><Zap size={16} fill="#212700" style={{ color: "#212700" }} /></span>Aftermarket options <span className="font-normal opacity-60">({g.aftermarket.length})</span></span>
@@ -773,18 +696,10 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
       </div>
       {gid === "cam-follower" ? <Art id="bits" cap={'Both fit a ¼" drive. The forums are full of people who bought the wrong one.'} /> : null}
       <h3 className="mt-6 font-bold text-lg">Before you start</h3>
-      <ul className="mt-2 space-y-2">{g.before.filter(x => vis(x, choice)).map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{txt(s)}</li>)}</ul>
+      <ul className="mt-2 space-y-2">{g.before.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{s}</li>)}</ul>
 
-      {chapters.length ? chapters.map(c => { const mine = visibleSteps.filter(st => st.chapter === c.id); const start = visibleSteps.indexOf(mine[0]); return (
-        <div key={c.id}>
-          <H2 id={`ch-${c.id}`}>{c.title}</H2>
-          {c.blurb ? <p className="text-gray-600 -mt-1 mb-3">{c.blurb}</p> : null}
-          {mine.map((s, i) => <Step key={i} s={{ ...s, n: start + i + 1 }} choice={choice} />)}
-        </div>); })
-      : (<>
-        <H2 id="steps">Steps</H2>
-        {visibleSteps.map((s, i) => <Step key={i} s={{ ...s, n: i + 1 }} choice={choice} />)}
-      </>)}
+      <H2 id="steps">Steps</H2>
+      {g.steps.filter(x => vis(x, choice)).map((s, i) => <Step key={i} s={{ ...s, n: i + 1 }} choice={choice} />)}
 
       {g.alsoReplace && g.alsoReplace.length ? (<>
         <H2 id="also"><span className="inline-flex items-center gap-2"><Lightbulb size={24} className="shrink-0" style={{ color: "#936700" }} aria-hidden />While you're in there</span></H2>
@@ -834,6 +749,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice }) {
 }
 
 function KitScreen({ go, back, guide: g, choice }) {
+  const backLabel = g.title; // the kit belongs to one guide; back goes to it
   const [have, setHave] = useState({});
   const toggle = k => setHave(h => ({ ...h, [k]: !h[k] }));
   const Row = ({ k, name, note, pn, price, links }) => (
@@ -855,7 +771,7 @@ function KitScreen({ go, back, guide: g, choice }) {
     </div>
   );
   return (
-    <Frame onHome={() => go({ screen: "home" })} onBack={back} crumbs={g.fits}>
+    <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel || "Home"}>
       <div className="pt-4">
         <div className="text-sm text-gray-500">{g.title}</div>
         <h1 className="wide font-black text-3xl tracking-tight mt-1">Shopping list</h1>
@@ -865,7 +781,7 @@ function KitScreen({ go, back, guide: g, choice }) {
       <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
         {g.parts.filter(x => vis(x, choice)).map((p, i) => <Row key={i} k={`p${i}`} name={p.name} note={(p.tier ? (TIER[p.tier] || p.tier) + " · " : "") + (p.note || "")} pn={p.pn} price={p.price} links={p.links} />)}
       </div>
-      {g.aftermarket && g.aftermarket.length ? (<>
+      {showAftermarket(g, choice) ? (<>
         <h2 className="mt-6 mb-2 font-bold text-lg">Aftermarket options</h2>
         <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
           {g.aftermarket.map((a, i) => <Row key={i} k={`a${i}`} name={a.name} note={(a.signal ? a.signal + " · " : "") + (a.note || "")} price={a.price} links={a.links} />)}
@@ -974,7 +890,7 @@ export default function App() {
     </Frame>
   );
   if (!db) return (
-    <Frame onHome={() => {}} dark>
+    <Frame onHome={() => {}} dark title="Top Dead Center">
       {splash ? <Splash onDone={endSplash} /> : null}
       <div className="pt-10 text-gray-500">Loading guides…</div>
     </Frame>
@@ -987,7 +903,7 @@ export default function App() {
   return (
     <>
       {splash ? <Splash onDone={endSplash} /> : null}
-      <Frame onHome={() => setStack([{ screen: "home" }])} dark>
+      <Frame onHome={() => setStack([{ screen: "home" }])} dark title="Top Dead Center">
         <HomeScreen go={go} db={db} />
       </Frame>
     </>
