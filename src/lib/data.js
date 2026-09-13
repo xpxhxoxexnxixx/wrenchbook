@@ -23,7 +23,7 @@ export async function loadCatalog() {
     gens: Object.fromEntries(Object.entries(groupBy(gens, "model_id")).map(([k, v]) => [k, v.map(g => ({ id: g.id, name: g.name, from: g.year_from, to: g.year_to, live: g.live }))])),
     // powertrains keyed by generation id
     powertrains: groupBy(powertrains.filter(p => p.generation_id), "generation_id"),
-    categories: ["Engine", "Forced induction", "Suspension", "Brakes", "Drivetrain", "Electrical", "Exterior", "Interior"],
+    categories: ["Engine", "Forced induction", "Suspension", "Steering", "Brakes", "Drivetrain", "Electrical", "Exterior", "Interior"],
   };
 }
 
