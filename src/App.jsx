@@ -91,11 +91,13 @@ const useLockBodyScroll = () => {
   }, []);
 };
 
-/* Variant visibility: any item may carry `only: ["optionId", ...]`. Items without `only` show for everyone. */
-const vis = (item, choice) => !item || !item.only || !choice || item.only.includes(choice);
+/* Variant visibility. `choice` is one option id (single question) or an array of ids (one per question). An `only` entry
+   may be a single id or an "a+b" combination that needs every listed id chosen. Items with no `only` show for everyone. */
+const chosenIds = choice => new Set(Array.isArray(choice) ? choice : choice ? [choice] : []);
+const vis = (item, choice) => { if (!item || !item.only || !choice) return true; const c = chosenIds(choice); return item.only.some(e => String(e).split("+").every(id => c.has(id))); };
 const txt = item => (typeof item === "string" ? item : item.text);
 
-const VariantModal = ({ v, onPick }) => {
+const VariantModal = ({ v, onPick, step }) => {
   useLockBodyScroll();
   // The overlay itself scrolls. With a bottom-aligned card, a question with five options could be taller than the
   // phone screen; its top was pushed above the viewport with no way to reach it. Now a short card still sits at
@@ -106,7 +108,7 @@ const VariantModal = ({ v, onPick }) => {
     <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
     <div className="flex min-h-full items-end justify-center p-3 sm:items-center">
     <div className="relative w-full max-w-[480px] rounded-md p-5 shadow-2xl" style={{ background: "#FDFDFC" }}>
-      <div className="text-xs text-gray-500">Before you start</div>
+      <div className="text-xs text-gray-500">Before you start{step ? ` · question ${step}` : ""}</div>
       <h2 id="variant-q" className="wide font-black text-2xl leading-tight mt-1">{v.question}</h2>
       {v.hint ? <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">{v.hint}</p> : null}
       <div className="mt-4 grid gap-2">
@@ -380,8 +382,10 @@ const Splash = ({ onDone }) => {
  *  Options flagged `brand: true` are specific products; an "other" option leaves the list visible. */
 const showAftermarket = (g, choice) => {
   if (!g.aftermarket || !g.aftermarket.length) return false;
-  const opt = g.variants && g.variants.options.find(o => o.id === choice);
-  return !(opt && opt.brand);
+  // Works for one question or several: hide the list if any chosen option is a specific brand/kit.
+  const qs = g.variants ? (g.variants.questions || [g.variants]) : [];
+  const chosen = chosenIds(choice);
+  return !qs.some(q => (q.options || []).some(o => chosen.has(o.id) && o.brand));
 };
 
 /** Horizontal bar chart for a guide body block: { title, unit, baseline, bars: [{label, v, note}], source, c }. Baseline (the stock figure) is drawn grey. */
@@ -647,6 +651,9 @@ const CatArt = ({ name, size = 48 }) => {
 function Browse({ nav, go, back, db }) {
   const { brand, model, gen, pt, cat } = nav;
   const range = g => `${g.from}–${g.to || "present"}`;
+  // A generation with a single live engine skips the engine picker and goes straight to categories (R32, Mk7).
+  const livePts = g => (db.powertrains[g.id] || []).filter(p => p.live);
+  const pickGen = g => { const pts = livePts(g); go(pts.length === 1 ? { ...nav, gen: g, pt: pts[0] } : { ...nav, gen: g }); };
   const Row = ({ title, sub, subAbove, live, onClick, art }) => (
     <button disabled={!live} onClick={onClick} className={`card flex w-full items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${live ? "" : "opacity-50"}`}>
       <div className="flex items-center gap-3">{art || null}<div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div></div>
@@ -655,13 +662,16 @@ function Browse({ nav, go, back, db }) {
   );
   let title, list, backLabel;
   if (!model) { title = brand.name; backLabel = "Home"; list = db.models[brand.id].map(m => <Row key={m.id} title={m.name} live={m.live} onClick={() => go({ ...nav, model: m })} />); }
-  else if (!gen) { title = `${brand.name} ${model.name}`; backLabel = "Models"; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => go({ ...nav, gen: g })} />); }
+  else if (!gen) { title = `${brand.name} ${model.name}`; backLabel = "Models"; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => pickGen(g)} />); }
   else if (!pt) { title = `${model.name} ${gen.name} · ${range(gen)}`; backLabel = "Model years"; list = (db.powertrains[gen.id] || []).map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
-  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = "Engines"; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} onClick={() => go({ ...nav, cat: c })} />; }); }
+  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = livePts(gen).length === 1 ? "Model years" : "Engines"; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} onClick={() => go({ ...nav, cat: c })} />; }); }
   else { title = cat; backLabel = `${pt.name} categories`; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
+  // The task list is the one screen whose title (the category) says nothing about the car, so the vehicle sits above it.
+  const above = cat && pt ? `${model.name} ${gen.name} · ${shortEngine(pt)}` : null;
   return (
     <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel}>
-      <div className="flex items-center gap-3 pt-4 pb-4">
+      {above ? <div className="pt-4 text-xs font-bold uppercase tracking-wide teal">{above}</div> : null}
+      <div className={`flex items-center gap-3 ${above ? "pt-1" : "pt-4"} pb-4`}>
         {cat ? <CatArt name={cat} size={52} /> : null}
         <h1 className="wide font-black text-3xl tracking-tight">{title}</h1>
       </div>
@@ -685,12 +695,28 @@ const guideBackLabel = g => (g && g.category) ? g.category : "Home";
 function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
   const gid = g.id;
   const v = g.variants;
+  // One question ({ question, options }) or several ({ questions: [...] }); the answer is an id or an array of ids.
+  const qs = v ? (v.questions || [v]) : [];
   const [choice, setChoice] = useState(initialChoice || null);
-  const [asking, setAsking] = useState(!!v && !initialChoice);
+  const answered = qs.length <= 1 ? (choice ? 1 : 0) : (Array.isArray(choice) ? choice.length : 0);
+  const [asking, setAsking] = useState(qs.length > 0 && answered < qs.length);
   const [showAM, setShowAM] = useState(false);
-  const chosen = v && choice ? v.options.find(o => o.id === choice) : null;
+  const chosen = qs.length && answered >= qs.length ? { label: qs.map((q, i) => q.options.find(o => o.id === (qs.length <= 1 ? choice : choice[i]))?.label).filter(Boolean).join(" · ") } : null;
+  const pick = id => {
+    const next = qs.length <= 1 ? id : [...(Array.isArray(choice) ? choice : []), id];
+    setChoice(next);
+    const done = qs.length <= 1 || next.length >= qs.length;
+    if (done) { setAsking(false); onChoice && onChoice(next); toTop(); }
+  };
+  const reask = () => { setChoice(qs.length <= 1 ? null : []); setAsking(true); };
   const [active, setActive] = useState("glance");
-  const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],["steps","Steps"],...(g.alsoReplace && g.alsoReplace.length ? [["also","While you're in there"]] : []),["read", g.check.tab],["after","After"],["sources","Sources"]];
+  // Chapters: a long guide can group its steps under `chapters` ([{ id, title, blurb }], steps carry `chapter`). Each chapter with
+  // visible steps gets its own tab and heading; steps still number straight through. Guides without chapters get one "Steps" tab.
+  const visibleSteps = g.steps.filter(x => vis(x, choice));
+  const chapters = (g.chapters || []).filter(c => visibleSteps.some(st => st.chapter === c.id));
+  const stepTabs = chapters.length ? chapters.map(c => [`ch-${c.id}`, c.title]) : [["steps", "Steps"]];
+  const nav = [["glance","At a glance"],["should","Should you?"],["need","Parts & tools"],...stepTabs,...(g.alsoReplace && g.alsoReplace.length ? [["also","While you're in there"]] : []),["read", g.check.tab],["after","After"],["sources","Sources"]];
+  const navRef = useRef(nav); navRef.current = nav;
   const tabRefs = useRef({});
 
   // Scrollspy: the active tab is the last section whose top has passed the sticky bars.
@@ -699,6 +725,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
+        const nav = navRef.current;
         const line = 120;
         let cur = nav[0][0];
         for (const [id] of nav) {
@@ -739,12 +766,12 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
         <div className="text-sm text-gray-500">{g.category} · {g.fits}</div>
         <h1 className="wide font-black text-[32px] leading-[1.02] tracking-tight mt-1">{g.title}</h1>
         {chosen ? (
-          <button onClick={() => setAsking(true)} className="mt-3 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm font-semibold text-white" style={{ background: "#0F2230" }}>
-            <span>{chosen.label}</span><Repeat size={14} className="text-gray-300" /><span className="text-gray-300 font-normal">change</span>
+          <button onClick={reask} className="mt-3 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-left text-sm font-semibold text-white" style={{ background: "#0F2230" }}>
+            <span className="flex-1 min-w-0">{chosen.label}</span><span className="inline-flex shrink-0 items-center gap-1"><Repeat size={14} className="text-gray-300" /><span className="text-gray-300 font-normal">change</span></span>
           </button>
         ) : null}
       </div>
-      {asking && v ? <VariantModal v={v} onPick={id => { setChoice(id); setAsking(false); onChoice && onChoice(id); toTop(); }} /> : null}
+      {asking && qs.length ? <VariantModal v={qs[Math.min(answered, qs.length - 1)]} step={qs.length > 1 ? `${answered + 1} of ${qs.length}` : null} onPick={pick} /> : null}
 
       <figure className="relative mt-5 mb-1 px-6">
         <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
@@ -765,7 +792,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
       </div>
       <p className="mt-2 text-sm text-gray-600">{txt(g.glance.note)}</p>
       <Art id={g.heroId || (g.kind === "upgrade" ? "rsbhero" : "hero")} cap={g.heroCap} />
-      {g.embeds && g.embeds.length && g.embeds[0].id ? <Video id={g.embeds[0].id} title="Watch the whole job" note={g.embeds[0].note} /> : null}
+      {(g.embeds || []).filter(e => e.id && vis(e, choice)).map((e, i) => <Video key={e.id} id={e.id} title={i === 0 ? "Watch the whole job" : "Also worth watching"} note={e.note} />)}
 
       <H2 id="should">Should you do this?</H2>
       <div className="font-semibold">Yes, if any of these are true</div>
@@ -776,7 +803,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
 
       <H2 id="need">What you need</H2>
       <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div>{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
       </div>
       <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm px-4 py-3 text-left font-semibold text-white" style={{ background: "#0E494D" }}><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
       {showAftermarket(g, choice) ? (
@@ -807,10 +834,18 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
       </div>
       {gid === "cam-follower" ? <Art id="bits" cap={'Both fit a ¼" drive. The forums are full of people who bought the wrong one.'} /> : null}
       <h3 className="mt-6 font-bold text-lg">Before you start</h3>
-      <ul className="mt-2 space-y-2">{g.before.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{s}</li>)}</ul>
+      <ul className="mt-2 space-y-2">{g.before.filter(x => vis(x, choice)).map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-900" />{txt(s)}</li>)}</ul>
 
-      <H2 id="steps">Steps</H2>
-      {g.steps.filter(x => vis(x, choice)).map((s, i) => <Step key={i} s={{ ...s, n: i + 1 }} choice={choice} />)}
+      {chapters.length ? chapters.map(c => { const mine = visibleSteps.filter(st => st.chapter === c.id); const start = visibleSteps.indexOf(mine[0]); return (
+        <div key={c.id}>
+          <H2 id={`ch-${c.id}`}>{c.title}</H2>
+          {c.blurb ? <p className="text-gray-600 -mt-1 mb-3">{c.blurb}</p> : null}
+          {mine.map((s, i) => <Step key={i} s={{ ...s, n: start + i + 1 }} choice={choice} />)}
+        </div>); })
+      : (<>
+        <H2 id="steps">Steps</H2>
+        {visibleSteps.map((s, i) => <Step key={i} s={{ ...s, n: i + 1 }} choice={choice} />)}
+      </>)}
 
       {g.alsoReplace && g.alsoReplace.length ? (<>
         <H2 id="also"><span className="inline-flex items-center gap-2"><Lightbulb size={24} className="shrink-0" style={{ color: "#936700" }} aria-hidden />While you're in there</span></H2>
