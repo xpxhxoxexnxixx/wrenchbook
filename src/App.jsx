@@ -635,6 +635,14 @@ const CatArt = ({ name, size = 48 }) => {
       <circle cx="36" cy="34" r="5" fill={c.deep} /><circle cx="36" cy="34" r="2.2" fill={c.pale} />
       <rect x="42" y="26" width="4" height="3" rx="1" fill={c.mid} />
     </>),
+    "Bushings & mounts": (<>
+      <ellipse cx="24" cy="26" rx="18" ry="14" fill={c.navy} />
+      <ellipse cx="24" cy="26" rx="12" ry="9" fill={c.mid} />
+      <ellipse cx="24" cy="26" rx="6" ry="4.5" fill={c.pale} />
+      <rect x="21" y="6" width="6" height="40" rx="1.5" fill={c.deep} />
+      <rect x="18" y="4" width="12" height="6" rx="1" fill={c.teal} stroke={c.deep} strokeWidth="1" />
+      <rect x="18" y="40" width="12" height="4" rx="1" fill={c.teal} stroke={c.deep} strokeWidth="1" />
+    </>),
     Steering: (<>
       <circle cx="24" cy="26" r="17" fill="none" stroke={c.navy} strokeWidth="4.5" />
       <circle cx="24" cy="26" r="4.5" fill={c.navy} />
