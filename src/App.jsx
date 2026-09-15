@@ -24,6 +24,8 @@ const CSS = `
 .wb .tab-idle { background:#F3F3EF; }
 .wb h2[id], .wb #glance, .wb [id^="step-"] { scroll-margin-top: 104px; }
 .wb .wide { letter-spacing: -0.02em; }
+/* Parts, tools and shopping-list rows: the price sits right, takes only what it needs (never more than 40% of the row) and wraps; the name column keeps the rest. */
+.wb .pt-price { flex: 0 1 auto; max-width: 40%; text-align: right; overflow-wrap: anywhere; }
 .wb .narrow { letter-spacing: 0; }
 .teal { color:#0E494D; }
 .wb h1, .wb h2, .wb h3 { color:#0F2230; }
@@ -713,19 +715,24 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
   const gid = g.id;
   const v = g.variants;
   // One question ({ question, options }) or several ({ questions: [...] }); the answer is an id or an array of ids.
-  const qs = v ? (v.questions || [v]) : [];
+  // A question may carry `only` (like a step or a part) so it is asked only after a matching earlier answer: "Which upgrade?"
+  // only when the first answer was "upgrade". A hidden question is skipped entirely and takes no slot in the answer array.
+  const allQs = v ? (v.questions || [v]) : [];
+  const multi = allQs.length > 1;
+  const visibleQs = c => allQs.filter(q => vis(q, multi ? (c || []) : c));
   const [choice, setChoice] = useState(initialChoice || null);
-  const answered = qs.length <= 1 ? (choice ? 1 : 0) : (Array.isArray(choice) ? choice.length : 0);
+  const qs = visibleQs(choice);
+  const answered = !multi ? (choice ? 1 : 0) : (Array.isArray(choice) ? choice.length : 0);
   const [asking, setAsking] = useState(qs.length > 0 && answered < qs.length);
   const [showAM, setShowAM] = useState(false);
-  const chosen = qs.length && answered >= qs.length ? { label: qs.map((q, i) => q.options.find(o => o.id === (qs.length <= 1 ? choice : choice[i]))?.label).filter(Boolean).join(" · ") } : null;
+  const chosen = qs.length && answered >= qs.length ? { label: qs.map((q, i) => q.options.find(o => o.id === (!multi ? choice : choice[i]))?.label).filter(Boolean).join(" · ") } : null;
   const pick = id => {
-    const next = qs.length <= 1 ? id : [...(Array.isArray(choice) ? choice : []), id];
+    const next = !multi ? id : [...(Array.isArray(choice) ? choice : []), id];
     setChoice(next);
-    const done = qs.length <= 1 || next.length >= qs.length;
+    const done = !multi || next.length >= visibleQs(next).length;
     if (done) { setAsking(false); onChoice && onChoice(next); toTop(); }
   };
-  const reask = () => { setChoice(qs.length <= 1 ? null : []); setAsking(true); };
+  const reask = () => { setChoice(!multi ? null : []); setAsking(true); };
   const [active, setActive] = useState("glance");
   // Chapters: a long guide can group its steps under `chapters` ([{ id, title, blurb }], steps carry `chapter`). Each chapter with
   // visible steps gets its own tab and heading; steps still number straight through. Guides without chapters get one "Steps" tab.
@@ -788,7 +795,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
           </button>
         ) : null}
       </div>
-      {asking && qs.length ? <VariantModal v={qs[Math.min(answered, qs.length - 1)]} step={qs.length > 1 ? `${answered + 1} of ${qs.length}` : null} onPick={pick} /> : null}
+      {asking && qs.length ? <VariantModal v={qs[Math.min(answered, qs.length - 1)]} step={allQs.some(q => q.only) ? `${answered + 1}` : (qs.length > 1 ? `${answered + 1} of ${qs.length}` : null)} onPick={pick} /> : null}
 
       <figure className="relative mt-5 mb-1 px-6">
         <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
@@ -820,7 +827,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
 
       <H2 id="need">What you need</H2>
       <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div>{p.pn && p.pn !== p.price ? <div className="mt-0.5 text-xs font-mono text-gray-600 break-words">{p.pn}</div> : null}<div className="text-sm text-gray-600">{p.note}</div></div><div className="pt-price text-sm text-gray-500">{p.price}</div></div>)}
       </div>
       <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm px-4 py-3 text-left font-semibold text-white" style={{ background: "#0E494D" }}><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
       {showAftermarket(g, choice) ? (
@@ -834,8 +841,8 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
               {g.aftermarket.filter(x => vis(x, choice)).map((a, i) => (
                 <div key={i} className="p-3">
                   <div className="flex items-start justify-between gap-3">
-                    <div><div className="font-semibold">{a.name}</div><div className="text-sm text-gray-600">{a.note}</div></div>
-                    <div className="shrink-0 text-sm text-gray-700">{a.price}</div>
+                    <div className="min-w-0 flex-1"><div className="font-semibold">{a.name}</div><div className="text-sm text-gray-600">{a.note}</div></div>
+                    <div className="pt-price text-sm text-gray-700">{a.price}</div>
                   </div>
                   {a.signal ? <div className="mt-1 inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold" style={{ background: "#E5FE52", color: "#343D01" }}><Star size={12} />{a.signal}</div> : null}
                   {a.links && a.links.length ? <div className="mt-2 flex flex-wrap gap-2">{a.links.map((l, k) => <a key={k} href={l.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-sm bg-gray-900 px-2.5 py-1 text-sm font-semibold text-white">{l.store}<ExternalLink size={13} /></a>)}</div> : null}
@@ -847,7 +854,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
         </div>
       ) : null}
       <div className="card mt-3 rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.tools.filter(x => vis(x, choice)).map((t, i) => <div key={i} className="flex gap-3 p-3"><Wrench size={18} className="mt-0.5 shrink-0 text-gray-500" /><div className="flex-1"><div className="font-semibold">{t.name}</div>{t.note ? <div className="text-sm text-gray-600">{t.note}</div> : null}</div><div className="shrink-0 text-sm text-gray-500">{t.price}</div></div>)}
+        {g.tools.filter(x => vis(x, choice)).map((t, i) => <div key={i} className="flex gap-3 p-3"><Wrench size={18} className="mt-0.5 shrink-0 text-gray-500" /><div className="flex-1"><div className="font-semibold">{t.name}</div>{t.note ? <div className="text-sm text-gray-600">{t.note}</div> : null}</div><div className="pt-price text-sm text-gray-500">{t.price}</div></div>)}
       </div>
       {gid === "cam-follower" ? <Art id="bits" cap={'Both fit a ¼" drive. The forums are full of people who bought the wrong one.'} /> : null}
       <h3 className="mt-6 font-bold text-lg">Before you start</h3>
@@ -929,7 +936,7 @@ function KitScreen({ go, back, guide: g, choice }) {
             </div>
           ) : null}
         </div>
-        <div className="shrink-0 text-sm font-semibold text-gray-700">{price}</div>
+        <div className="pt-price text-sm font-semibold text-gray-700">{price}</div>
       </div>
     </div>
   );
