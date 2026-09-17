@@ -947,7 +947,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel, redlineMod
 
       <H2 id="need">What you need</H2>
       <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div>{p.pn && p.pn !== p.price ? <div className="mt-0.5 break-words font-mono text-xs text-gray-500">{p.pn}</div> : null}<div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 whitespace-nowrap text-right text-sm text-gray-500">{p.price}</div></div>)}
       </div>
       <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm px-4 py-3 text-left font-semibold text-white" style={{ background: "#0E494D" }}><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
       {showAftermarket(g, choice) ? (
