@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback, useId } from "react";
 import { loadCatalog, loadTasks, loadGuide, illustrationUrl, submitRequest } from "./lib/data";
 import { Search, ChevronRight, ChevronLeft, Clock, Wrench, Gauge, ShieldAlert, Play, Quote, ExternalLink, ShoppingCart, ChevronDown, Star, Repeat, Zap, X, Maximize2, Check, ThumbsUp, Hourglass, FileClock, MessageSquarePlus, Send, PlusCircle, Lightbulb, CalendarCheck } from "lucide-react";
 
@@ -24,8 +24,6 @@ const CSS = `
 .wb .tab-idle { background:#F3F3EF; }
 .wb h2[id], .wb #glance, .wb [id^="step-"] { scroll-margin-top: 104px; }
 .wb .wide { letter-spacing: -0.02em; }
-/* Parts, tools and shopping-list rows: the price sits right, takes only what it needs (never more than 40% of the row) and wraps; the name column keeps the rest. */
-.wb .pt-price { flex: 0 1 auto; max-width: 40%; text-align: right; overflow-wrap: anywhere; }
 .wb .narrow { letter-spacing: 0; }
 .teal { color:#0E494D; }
 .wb h1, .wb h2, .wb h3 { color:#0F2230; }
@@ -99,8 +97,16 @@ const chosenIds = choice => new Set(Array.isArray(choice) ? choice : choice ? [c
 const vis = (item, choice) => { if (!item || !item.only || !choice) return true; const c = chosenIds(choice); return item.only.some(e => String(e).split("+").every(id => c.has(id))); };
 const txt = item => (typeof item === "string" ? item : item.text);
 
-const VariantModal = ({ v, onPick, step }) => {
+const VariantModal = ({ v, onPick, step, redlineMode }) => {
   useLockBodyScroll();
+  // In redline mode, hide OE-only options at the gate. If only one option remains after filtering,
+  // pick it automatically so the user isn't stuck on a one-option question.
+  const visibleOptions = redlineMode ? v.options.filter(o => !o.oeOnly) : v.options;
+  useEffect(() => {
+    if (redlineMode && visibleOptions.length === 1 && v.options.length > 1) {
+      onPick(visibleOptions[0].id);
+    }
+  }, [redlineMode]);
   // The overlay itself scrolls. With a bottom-aligned card, a question with five options could be taller than the
   // phone screen; its top was pushed above the viewport with no way to reach it. Now a short card still sits at
   // the bottom, and a tall one starts at the top and scrolls within the overlay.
@@ -114,7 +120,7 @@ const VariantModal = ({ v, onPick, step }) => {
       <h2 id="variant-q" className="wide font-black text-2xl leading-tight mt-1">{v.question}</h2>
       {v.hint ? <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">{v.hint}</p> : null}
       <div className="mt-4 grid gap-2">
-        {v.options.map(o => (
+        {visibleOptions.map(o => (
           <button key={o.id} onClick={() => onPick(o.id)} className="rounded-sm border-2 border-gray-200 px-4 py-3 text-left hover:border-[#0B4664] focus-visible:border-[#0B4664]" style={{ background: "#F9F9F5" }}>
             <div className="font-bold text-[17px]">{o.label}</div>
             {o.when ? <div className="text-sm text-gray-600 mt-0.5">{o.when}</div> : null}
@@ -667,72 +673,186 @@ const CatArt = ({ name, size = 48 }) => {
   return <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className="shrink-0">{art}</svg>;
 };
 
-function Browse({ nav, go, back, db }) {
+/**
+ * Redline mode: hides OE / maintenance guides so only aftermarket and upgrade content shows.
+ * State lives at the App root; a first-time explainer modal appears until dismissed.
+ */
+const RedlineIcon = ({ on = false, size = 26 }) => {
+  // Tachometer swept up into the redline. OFF is entirely gray (no colour at all);
+  // ON lights the arc with an amber→red gradient, buries the needle in the red zone
+  // at the top-right, marks the redline ticks, and adds a soft glow.
+  // SVG angle convention: 0°=east (3 o'clock), 90°=south (6), 180°=west (9), 270°=north (12); +deg = clockwise (y down).
+  // Arc: start 100° (bottom) sweeping CW up the left and over the top to 315° (upper-right). Redline zone ≈ 270°–315°.
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
+  const gray = "#D8D8D4", redTick = "#F5301E";
+  const cx = 16, cy = 16.5, r = 12;
+  const polar = (deg, radius) => {
+    const rad = (deg * Math.PI) / 180;
+    return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
+  };
+  const s = polar(100, r), e = polar(315, r);
+  const arcPath = `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 1 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
+  const g1 = polar(100, r), g2 = polar(305, r);        // gradient runs bottom (amber) → upper-right (red)
+  const needleAng = on ? 305 : 100;                     // off → at rest (bottom); on → into the redline
+  const tip = polar(needleAng, r - 2.5);
+  const redlineTicks = [280, 295, 310];
+  const arcStroke = on ? `url(#rl-g-${uid})` : gray;
+  const needleColor = on ? redTick : gray;
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      {on && (
+        <defs>
+          <linearGradient id={`rl-g-${uid}`} gradientUnits="userSpaceOnUse" x1={g1.x.toFixed(2)} y1={g1.y.toFixed(2)} x2={g2.x.toFixed(2)} y2={g2.y.toFixed(2)}>
+            <stop offset="0" stopColor="#F6C544" />
+            <stop offset="0.45" stopColor="#FF7A1E" />
+            <stop offset="0.78" stopColor="#FF3B1E" />
+            <stop offset="1" stopColor="#E11C1C" />
+          </linearGradient>
+          <filter id={`rl-f-${uid}`} x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="1.1" />
+          </filter>
+        </defs>
+      )}
+      {on && <path d={arcPath} stroke={`url(#rl-g-${uid})`} strokeWidth="3.2" strokeLinecap="round" fill="none" filter={`url(#rl-f-${uid})`} opacity="0.55" />}
+      <path d={arcPath} stroke={arcStroke} strokeWidth="2" strokeLinecap="round" fill="none" />
+      {on && redlineTicks.map((a, i) => {
+        const outer = polar(a, r + 1.6);
+        const inner = polar(a, r - 0.2);
+        return <line key={i} x1={inner.x.toFixed(2)} y1={inner.y.toFixed(2)} x2={outer.x.toFixed(2)} y2={outer.y.toFixed(2)} stroke={redTick} strokeWidth="1.4" strokeLinecap="round" />;
+      })}
+      <line x1={cx} y1={cy} x2={tip.x.toFixed(2)} y2={tip.y.toFixed(2)} stroke={needleColor} strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r="2" fill={needleColor} />
+    </svg>
+  );
+};
+
+const RedlineToggle = ({ on, onTap }) => (
+  <button
+    type="button"
+    onClick={onTap}
+    className="flex items-center gap-2 rounded-full py-1 pl-1 pr-1"
+    aria-label={on ? "Redline mode on" : "Redline mode off"}
+    aria-pressed={on}
+  >
+    <RedlineIcon on={on} />
+    <span
+      className="inline-flex h-6 w-11 items-center rounded-full p-0.5"
+      style={{ background: on ? "#0E494D" : "#D1D5DB", transition: "background-color 180ms ease" }}
+    >
+      <span
+        className="h-5 w-5 rounded-full bg-white shadow-sm"
+        style={{ transform: on ? "translateX(20px)" : "translateX(0)", transition: "transform 180ms ease" }}
+      />
+    </span>
+  </button>
+);
+
+const RedlineModal = ({ onGo, onCancel }) => {
+  // Bottom sheet, matching the app's other modals: frosted backdrop, bottom-aligned on mobile / centred on
+  // desktop, sliding up on open and down on close. A `closing` state lets the sheet-out animation finish
+  // before the callback unmounts it. Colours are inline so they render regardless of Tailwind's arbitrary-value config.
+  useLockBodyScroll();
+  const [closing, setClosing] = useState(false);
+  const close = cb => { if (closing) return; setClosing(true); setTimeout(cb, 280); };
+  const anim = closing ? "sheet-out" : "sheet-in";
+  return (
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="redline-title">
+      <div className="absolute inset-0 bg-white/40 backdrop-blur-xl" onClick={() => close(onCancel)} />
+      <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+        <div className="flex min-h-full items-end justify-center p-3 sm:items-center">
+          <div className={`relative w-full max-w-[480px] rounded-md p-5 shadow-2xl ${anim}`} style={{ background: "#FDFDFC" }}>
+            <div className="flex items-center gap-3">
+              <RedlineIcon on size={34} />
+              <h2 id="redline-title" className="wide font-black text-2xl tracking-tight" style={{ color: "#0F2230" }}>Redline mode</h2>
+            </div>
+            <p className="mt-4 text-[16px] leading-relaxed" style={{ color: "#1F2937" }}>
+              Filters categories and guides to aftermarket parts and upgrades only.
+            </p>
+            <p className="mt-2 text-[14px] leading-relaxed" style={{ color: "#6B7280" }}>
+              Turn it off any time to see everything again.
+            </p>
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button onClick={() => close(onCancel)} className="rounded-sm px-4 py-2 text-[15px] font-bold" style={{ color: "#4B5563" }}>Cancel</button>
+              <button onClick={() => close(onGo)} className="rounded-sm px-5 py-2.5 text-[15px] font-bold shadow-sm" style={{ background: "#FF5A28", color: "#FFFFFF" }}>Turn it on</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function Browse({ nav, go, back, db, redlineMode, onToggleRedline }) {
   const { brand, model, gen, pt, cat } = nav;
   const range = g => `${g.from}–${g.to || "present"}`;
   // A generation with a single live engine skips the engine picker and goes straight to categories (R32, Mk7).
   const livePts = g => (db.powertrains[g.id] || []).filter(p => p.live);
   const pickGen = g => { const pts = livePts(g); go(pts.length === 1 ? { ...nav, gen: g, pt: pts[0] } : { ...nav, gen: g }); };
-  const Row = ({ title, sub, subAbove, live, onClick, art }) => (
+  const Row = ({ title, sub, subAbove, live, onClick, art, rightMark }) => (
     <button disabled={!live} onClick={onClick} className={`card flex w-full items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${live ? "" : "opacity-50"}`}>
       <div className="flex items-center gap-3">{art || null}<div>{sub && subAbove ? <div className="text-xs font-bold uppercase tracking-wide teal">{sub}</div> : null}<div className="font-bold text-[17px]">{title}</div>{sub && !subAbove ? <div className="text-sm text-gray-500">{sub}</div> : null}</div></div>
-      {live ? <ChevronRight size={18} className="text-blue-700" /> : <span className="rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Soon</span>}
+      {live ? <div className="flex items-center gap-2">{rightMark || null}<ChevronRight size={18} className="text-blue-700" /></div> : <span className="rounded-sm bg-gray-200 px-2 py-0.5 text-xs">Soon</span>}
     </button>
   );
   let title, list, backLabel;
   if (!model) { title = brand.name; backLabel = "Home"; list = db.models[brand.id].map(m => <Row key={m.id} title={m.name} live={m.live} onClick={() => go({ ...nav, model: m })} />); }
   else if (!gen) { title = `${brand.name} ${model.name}`; backLabel = "Models"; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => pickGen(g)} />); }
   else if (!pt) { title = `${model.name} ${gen.name} · ${range(gen)}`; backLabel = "Model years"; list = (db.powertrains[gen.id] || []).map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
-  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = livePts(gen).length === 1 ? "Model years" : "Engines"; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const n = mine.filter(t => t.cat === c).length; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} onClick={() => go({ ...nav, cat: c })} />; }); }
-  else { title = cat; backLabel = `${pt.name} categories`; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
+  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = livePts(gen).length === 1 ? "Model years" : "Engines"; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const inCat = mine.filter(t => t.cat === c); const nAll = inCat.length; const nRed = inCat.filter(t => t.redline).length; const n = redlineMode ? nRed : nAll; const showTach = redlineMode && nRed > 0; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} rightMark={showTach ? <RedlineIcon on size={22} /> : null} onClick={() => go({ ...nav, cat: c })} />; }); }
+  else { title = cat; backLabel = `${pt.name} categories`; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id && (!redlineMode || t.redline)).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
   // The task list is the one screen whose title (the category) says nothing about the car, so the vehicle sits above it.
   const above = cat && pt ? `${model.name} ${gen.name} · ${shortEngine(pt)}` : null;
   return (
     <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel}>
       {above ? <div className="pt-4 text-xs font-bold uppercase tracking-wide teal">{above}</div> : null}
-      <div className={`flex items-center gap-3 ${above ? "pt-1" : "pt-4"} pb-4`}>
-        {cat ? <CatArt name={cat} size={52} /> : null}
-        <h1 className="wide font-black text-3xl tracking-tight">{title}</h1>
+      <div className={`flex items-start justify-between gap-3 ${above ? "pt-1" : "pt-4"} pb-4`}>
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {cat ? <CatArt name={cat} size={52} /> : null}
+          <h1 className="wide font-black text-3xl tracking-tight">{title}</h1>
+        </div>
+        {pt && !cat && onToggleRedline ? (
+          <div className="pt-2 shrink-0"><RedlineToggle on={redlineMode} onTap={onToggleRedline} /></div>
+        ) : cat && redlineMode ? (
+          <div className="flex shrink-0 items-center gap-1.5 pt-3">
+            <RedlineIcon on size={20} />
+            <span className="text-sm font-bold" style={{ color: "#FF5A28" }}>Redline mode on</span>
+          </div>
+        ) : null}
       </div>
       <div className="space-y-2">{list}</div>
     </Frame>
   );
 }
 
-function GuideScreen({ go, back, gid, db, choice: initialChoice, onChoice }) {
+function GuideScreen({ go, back, gid, db, choice: initialChoice, onChoice, redlineMode }) {
   const [g, setG] = useState(null);
   const [loadErr, setLoadErr] = useState(null);
   useEffect(() => { let on = true; loadGuide(gid).then(x => on && setG(x)).catch(e => on && setLoadErr(e.message || String(e))); return () => { on = false; }; }, [gid]);
   const backLabel = guideBackLabel(g);
   if (loadErr) return <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel}><p className="pt-10 text-gray-700">Couldn't load this guide. {loadErr}</p></Frame>;
   if (!g) return <Frame onHome={() => go({ screen: "home" })} onBack={back} backLabel={backLabel}><p className="pt-10 text-gray-500">Loading guide…</p></Frame>;
-  return <GuideBody go={go} back={back} g={g} initialChoice={initialChoice} onChoice={onChoice} backLabel={backLabel} />;
+  return <GuideBody go={go} back={back} g={g} initialChoice={initialChoice} onChoice={onChoice} backLabel={backLabel} redlineMode={redlineMode} />;
 }
 /** Label the back button on a guide screen with the category or "Home" — depends on whether we're inside the drill-down. */
 const guideBackLabel = g => (g && g.category) ? g.category : "Home";
 
-function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
+function GuideBody({ go, back, g, initialChoice, onChoice, backLabel, redlineMode }) {
   const gid = g.id;
   const v = g.variants;
   // One question ({ question, options }) or several ({ questions: [...] }); the answer is an id or an array of ids.
-  // A question may carry `only` (like a step or a part) so it is asked only after a matching earlier answer: "Which upgrade?"
-  // only when the first answer was "upgrade". A hidden question is skipped entirely and takes no slot in the answer array.
-  const allQs = v ? (v.questions || [v]) : [];
-  const multi = allQs.length > 1;
-  const visibleQs = c => allQs.filter(q => vis(q, multi ? (c || []) : c));
+  const qs = v ? (v.questions || [v]) : [];
   const [choice, setChoice] = useState(initialChoice || null);
-  const qs = visibleQs(choice);
-  const answered = !multi ? (choice ? 1 : 0) : (Array.isArray(choice) ? choice.length : 0);
+  const answered = qs.length <= 1 ? (choice ? 1 : 0) : (Array.isArray(choice) ? choice.length : 0);
   const [asking, setAsking] = useState(qs.length > 0 && answered < qs.length);
   const [showAM, setShowAM] = useState(false);
-  const chosen = qs.length && answered >= qs.length ? { label: qs.map((q, i) => q.options.find(o => o.id === (!multi ? choice : choice[i]))?.label).filter(Boolean).join(" · ") } : null;
+  const chosen = qs.length && answered >= qs.length ? { label: qs.map((q, i) => q.options.find(o => o.id === (qs.length <= 1 ? choice : choice[i]))?.label).filter(Boolean).join(" · ") } : null;
   const pick = id => {
-    const next = !multi ? id : [...(Array.isArray(choice) ? choice : []), id];
+    const next = qs.length <= 1 ? id : [...(Array.isArray(choice) ? choice : []), id];
     setChoice(next);
-    const done = !multi || next.length >= visibleQs(next).length;
+    const done = qs.length <= 1 || next.length >= qs.length;
     if (done) { setAsking(false); onChoice && onChoice(next); toTop(); }
   };
-  const reask = () => { setChoice(!multi ? null : []); setAsking(true); };
+  const reask = () => { setChoice(qs.length <= 1 ? null : []); setAsking(true); };
   const [active, setActive] = useState("glance");
   // Chapters: a long guide can group its steps under `chapters` ([{ id, title, blurb }], steps carry `chapter`). Each chapter with
   // visible steps gets its own tab and heading; steps still number straight through. Guides without chapters get one "Steps" tab.
@@ -795,7 +915,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
           </button>
         ) : null}
       </div>
-      {asking && qs.length ? <VariantModal v={qs[Math.min(answered, qs.length - 1)]} step={allQs.some(q => q.only) ? `${answered + 1}` : (qs.length > 1 ? `${answered + 1} of ${qs.length}` : null)} onPick={pick} /> : null}
+      {asking && qs.length ? <VariantModal v={qs[Math.min(answered, qs.length - 1)]} step={qs.length > 1 ? `${answered + 1} of ${qs.length}` : null} onPick={pick} redlineMode={redlineMode} /> : null}
 
       <figure className="relative mt-5 mb-1 px-6">
         <Quote size={64} strokeWidth={0} fill="#9AD4D7" className="absolute left-0 -top-3 -scale-x-100 pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
@@ -827,7 +947,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
 
       <H2 id="need">What you need</H2>
       <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div>{p.pn && p.pn !== p.price ? <div className="mt-0.5 text-xs font-mono text-gray-600 break-words">{p.pn}</div> : null}<div className="text-sm text-gray-600">{p.note}</div></div><div className="pt-price text-sm text-gray-500">{p.price}</div></div>)}
+        {g.parts.filter(x => vis(x, choice)).map((p, i) => <div key={i} className="flex justify-between gap-3 p-3"><div className="min-w-0 flex-1">{p.tier ? <div className="text-[11px] font-bold teal">{TIER[p.tier] || p.tier}</div> : null}<div className="font-semibold">{p.name}</div><div className="text-sm text-gray-600">{p.note}</div></div><div className="shrink-0 text-right text-sm text-gray-700">{p.pn !== p.price ? <div className="font-mono">{p.pn}</div> : null}<div className="text-gray-500">{p.price}</div></div></div>)}
       </div>
       <button onClick={openKit} className="mt-3 flex w-full items-center justify-between rounded-sm px-4 py-3 text-left font-semibold text-white" style={{ background: "#0E494D" }}><span className="flex items-center gap-2"><ShoppingCart size={18} />Full shopping list & where to buy</span><ChevronRight size={18} /></button>
       {showAftermarket(g, choice) ? (
@@ -841,8 +961,8 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
               {g.aftermarket.filter(x => vis(x, choice)).map((a, i) => (
                 <div key={i} className="p-3">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1"><div className="font-semibold">{a.name}</div><div className="text-sm text-gray-600">{a.note}</div></div>
-                    <div className="pt-price text-sm text-gray-700">{a.price}</div>
+                    <div><div className="font-semibold">{a.name}</div><div className="text-sm text-gray-600">{a.note}</div></div>
+                    <div className="shrink-0 text-sm text-gray-700">{a.price}</div>
                   </div>
                   {a.signal ? <div className="mt-1 inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold" style={{ background: "#E5FE52", color: "#343D01" }}><Star size={12} />{a.signal}</div> : null}
                   {a.links && a.links.length ? <div className="mt-2 flex flex-wrap gap-2">{a.links.map((l, k) => <a key={k} href={l.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-sm bg-gray-900 px-2.5 py-1 text-sm font-semibold text-white">{l.store}<ExternalLink size={13} /></a>)}</div> : null}
@@ -854,7 +974,7 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel }) {
         </div>
       ) : null}
       <div className="card mt-3 rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-        {g.tools.filter(x => vis(x, choice)).map((t, i) => <div key={i} className="flex gap-3 p-3"><Wrench size={18} className="mt-0.5 shrink-0 text-gray-500" /><div className="flex-1"><div className="font-semibold">{t.name}</div>{t.note ? <div className="text-sm text-gray-600">{t.note}</div> : null}</div><div className="pt-price text-sm text-gray-500">{t.price}</div></div>)}
+        {g.tools.filter(x => vis(x, choice)).map((t, i) => <div key={i} className="flex gap-3 p-3"><Wrench size={18} className="mt-0.5 shrink-0 text-gray-500" /><div className="flex-1"><div className="font-semibold">{t.name}</div>{t.note ? <div className="text-sm text-gray-600">{t.note}</div> : null}</div><div className="shrink-0 text-sm text-gray-500">{t.price}</div></div>)}
       </div>
       {gid === "cam-follower" ? <Art id="bits" cap={'Both fit a ¼" drive. The forums are full of people who bought the wrong one.'} /> : null}
       <h3 className="mt-6 font-bold text-lg">Before you start</h3>
@@ -936,7 +1056,7 @@ function KitScreen({ go, back, guide: g, choice }) {
             </div>
           ) : null}
         </div>
-        <div className="pt-price text-sm font-semibold text-gray-700">{price}</div>
+        <div className="shrink-0 text-sm font-semibold text-gray-700">{price}</div>
       </div>
     </div>
   );
@@ -1034,6 +1154,18 @@ export default function App() {
   const [splash, setSplash] = useState(true);
   const endSplash = useCallback(() => setSplash(false), []);
   const [stack, setStack] = useState([{ screen: "home" }]);
+  // Redline mode: hides OE / maintenance guides. Persists across nav; resets when the app reloads.
+  const [redlineMode, setRedlineMode] = useState(false);
+  const [redlineModalOpen, setRedlineModalOpen] = useState(false);
+  const redlineHasSeen = () => { try { return localStorage.getItem("tdc:redline-seen") === "1"; } catch (e) { return false; } };
+  const redlineMarkSeen = () => { try { localStorage.setItem("tdc:redline-seen", "1"); } catch (e) {} };
+  const askRedline = useCallback(() => {
+    if (redlineMode) { setRedlineMode(false); return; }
+    if (redlineHasSeen()) { setRedlineMode(true); return; }
+    setRedlineModalOpen(true);
+  }, [redlineMode]);
+  const confirmRedline = useCallback(() => { redlineMarkSeen(); setRedlineModalOpen(false); setRedlineMode(true); }, []);
+  const cancelRedline = useCallback(() => { redlineMarkSeen(); setRedlineModalOpen(false); }, []);
   const nav = stack[stack.length - 1];
   const go = n => setStack(s => [...s, n]);
   const back = () => setStack(s => (s.length > 1 ? s.slice(0, -1) : s));
@@ -1070,9 +1202,14 @@ export default function App() {
     </Frame>
   );
 
-  if (nav.screen === "guide") return <GuideScreen go={go} back={back} gid={nav.gid} db={db} choice={nav.choice} onChoice={id => patch({ choice: id })} />;
+  if (nav.screen === "guide") return <GuideScreen go={go} back={back} gid={nav.gid} db={db} choice={nav.choice} onChoice={id => patch({ choice: id })} redlineMode={redlineMode} />;
   if (nav.screen === "kit") return <KitScreen go={go} back={back} guide={nav.guide} choice={nav.choice} />;
-  if (nav.screen === "browse") return <Browse nav={nav} go={go} back={back} db={db} />;
+  if (nav.screen === "browse") return (
+    <>
+      <Browse nav={nav} go={go} back={back} db={db} redlineMode={redlineMode} onToggleRedline={askRedline} />
+      {redlineModalOpen ? <RedlineModal onGo={confirmRedline} onCancel={cancelRedline} /> : null}
+    </>
+  );
   if (nav.screen === "request") return <RequestScreen go={go} back={back} />;
   return (
     <>
