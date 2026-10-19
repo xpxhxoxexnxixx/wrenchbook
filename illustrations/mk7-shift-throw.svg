@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">How much shorter?</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Fore-aft throw only. Side-to-side gate stays the same.</text>
+<rect x="130" y="360" width="60" height="26" rx="6" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<path d="M160,360 L160,150" fill="none" stroke="#B7B7B4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M95.1,160.3 A210,210 0 0 1 224.9,160.3" fill="none" stroke="#FF5A28" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M160,360 L224.9,160.3" fill="none" stroke="#0F2230" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="224.89356881873897" cy="160.27813157801776" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="160" y="420" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="middle">Stock</text>
+<rect x="370" y="360" width="60" height="26" rx="6" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<path d="M400,360 L400,150" fill="none" stroke="#B7B7B4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M347.8,156.6 A210,210 0 0 1 452.2,156.6" fill="none" stroke="#FF5A28" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M400,360 L452.2,156.6" fill="none" stroke="#0F2230" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="452.2248763046195" cy="156.59753616298747" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="400" y="420" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="middle">20% shorter</text>
+<rect x="610" y="360" width="60" height="26" rx="6" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<path d="M640,360 L640,150" fill="none" stroke="#B7B7B4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M597.4,154.4 A210,210 0 0 1 682.6,154.4" fill="none" stroke="#FF5A28" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M640,360 L682.6,154.4" fill="none" stroke="#0F2230" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="682.5853320248676" cy="154.3632097694292" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="640" y="420" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="middle">35% shorter</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">Shorter throws take more effort per shift. Some kits are fixed, others adjust between settings.</text>
+</svg>

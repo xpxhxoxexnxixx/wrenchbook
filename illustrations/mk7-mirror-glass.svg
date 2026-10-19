@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Mirror glass: pop it, don&#x27;t pull it</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Clips are at the centre of the back plate.</text>
+<path d="M70,150 Q80,110 180,110 L380,120 Q430,125 430,180 L420,320 Q415,360 360,360 L120,360 Q60,360 60,300 Z" fill="#6B7078" stroke="#0F2230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M95,165 Q100,135 180,135 L370,142 Q402,146 402,185 L394,305 Q390,335 350,335 L130,335 Q88,335 88,295 Z" fill="#DCE8EE" stroke="#0B4664" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="250" y1="100" x2="250" y2="150" stroke="#0E494D" stroke-width="3" stroke-linecap="round"/>
+<path d="M245.2,140.1 L250,150 L254.8,140.1" fill="none" stroke="#0E494D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="250" y1="400" x2="250" y2="344" stroke="#FF5A28" stroke-width="3" stroke-linecap="round"/>
+<path d="M254.8,353.9 L250,344 L245.2,353.9" fill="none" stroke="#FF5A28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="100" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0E494D" text-anchor="start">1  tilt the top in</text>
+<text x="270" y="404" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#8A2A0A" text-anchor="start">2  pry gently at the lower centre</text>
+<rect x="470" y="150" width="300" height="180" rx="10" fill="#F1FAFF" stroke="#75D3D8" stroke-width="2"/>
+<text x="490" y="182" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#0B4664" text-anchor="start">Behind the glass</text>
+<text x="490" y="210.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Two heater tabs: unplug them</text>
+<text x="490" y="232.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">before the glass comes away.</text>
+<text x="490" y="254.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">New glass clicks on with</text>
+<text x="490" y="277.2" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">firm palm pressure at the centre.</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Cold glass breaks easily. Work on a warm day or warm it first, and put a towel underneath.</text>
+</svg>

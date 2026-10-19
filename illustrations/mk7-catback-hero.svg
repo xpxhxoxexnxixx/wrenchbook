@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Cat-back: what holds it up</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Underside view, front of the car on the left.</text>
+<path d="M40,240 L300,240 C340,240 360,200 420,200 L600,200" fill="none" stroke="#0F2230" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="600" y="160" width="140" height="90" rx="16" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<rect x="220" y="300" width="160" height="16" rx="4" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<circle cx="100" cy="240" r="7" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="300" cy="312" r="7" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="450" cy="200" r="7" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="640" cy="160" r="7" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="720" cy="160" r="7" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="100" cy="280" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="100" y="285" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="300" cy="350" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="300" y="355" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="450" cy="160" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="450" y="165" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="680" cy="120" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="680" y="125" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="32" y="404" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">1  Sleeve clamp at the downpipe (13 mm)      2  Cross brace, 4 nuts (13 mm)</text>
+<text x="32" y="430" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">3  Centre rubber hanger      4  Two rear hanger brackets (13 mm)</text>
+<text x="32" y="466" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">No cutting on the factory system. Have a helper support it as the rear brackets come off.</text>
+</svg>

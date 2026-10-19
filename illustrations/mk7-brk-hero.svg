@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Mk7 GTI front brake, exploded</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Inboard on the left, outboard on the right. Sizes and torques below.</text>
+<path d="M40,140 L100,140 L100,360 L40,360 Z" fill="#C9CED3" stroke="#0F2230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="110" y="190" width="40" height="120" rx="4" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<rect x="150" y="130" width="28" height="240" rx="2" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<line x1="159" y1="140" x2="159" y2="360" stroke="#B7B7B4" stroke-width="1" stroke-linecap="round"/>
+<line x1="169" y1="140" x2="169" y2="360" stroke="#B7B7B4" stroke-width="1" stroke-linecap="round"/>
+<path d="M290,150 L235,150 L235,350 L290,350 L290,320 L262,320 L262,180 L290,180 Z" fill="#C9CED3" stroke="#0F2230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="312" y="190" width="8" height="120" rx="1" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<rect x="320" y="196" width="16" height="108" rx="1" fill="#B7B7B4" stroke="#0F2230" stroke-width="2"/>
+<rect x="378" y="196" width="16" height="108" rx="1" fill="#B7B7B4" stroke="#0F2230" stroke-width="2"/>
+<rect x="394" y="190" width="8" height="120" rx="1" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<path d="M316,190 L316,168 Q316,152 332,150 L348,150" fill="none" stroke="#FF5A28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="424" y="215" width="22" height="70" rx="3" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<rect x="446" y="150" width="130" height="200" rx="14" fill="#4F9AA1" stroke="#0F2230" stroke-width="2"/>
+<rect x="576" y="162" width="26" height="22" rx="3" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<rect x="576" y="316" width="26" height="22" rx="3" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<circle cx="70" cy="108" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="70" y="113" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="160" cy="108" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="160" y="113" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="262" cy="108" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="262" y="113" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="357" cy="108" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="357" y="113" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<circle cx="511" cy="108" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="511" y="113" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">5</text>
+<circle cx="44" cy="399" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="44" y="404" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="66" y="404" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Knuckle: carrier bolts, 21 mm, 200 Nm</text>
+<circle cx="430" cy="399" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="430" y="404" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="452" y="404" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Rotor: T30 set screw, 4 Nm</text>
+<circle cx="44" cy="431" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="44" y="436" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="66" y="436" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Carrier: stays on for a pads-only job</text>
+<circle cx="430" cy="431" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="430" y="436" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="452" y="436" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Pads: wear sensor on left-front inner</text>
+<circle cx="44" cy="463" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="44" y="468" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="66" y="468" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Caliper: guide bolts, 13 mm, 35 Nm, new</text>
+<circle cx="430" cy="463" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="430" y="468" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">6</text>
+<text x="452" y="468" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Wheel bolts: 17 mm, 120 Nm</text>
+</svg>

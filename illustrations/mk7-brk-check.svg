@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Reading your pads and rotors</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Measure the friction material only, not the steel backing plate.</text>
+<rect x="60" y="130" width="14" height="170" rx="1" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<rect x="74" y="136" width="56" height="158" rx="1" fill="#B7B7B4" stroke="#0F2230" stroke-width="2"/>
+<text x="90" y="330" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">New</text>
+<text x="90" y="350" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">plenty left</text>
+<rect x="180" y="130" width="14" height="170" rx="1" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<rect x="194" y="136" width="24" height="158" rx="1" fill="#B7B7B4" stroke="#0F2230" stroke-width="2"/>
+<text x="210" y="330" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">About 5 mm</text>
+<text x="210" y="350" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">replace soon</text>
+<rect x="300" y="130" width="14" height="170" rx="1" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<rect x="314" y="136" width="8" height="158" rx="1" fill="#B7B7B4" stroke="#0F2230" stroke-width="2"/>
+<text x="330" y="330" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">2 mm</text>
+<text x="330" y="350" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">replace now</text>
+<text x="40" y="400.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">The inner pad wears faster than the one you</text>
+<text x="40" y="422.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">can see through the wheel. Judge by the inner.</text>
+<path d="M470,130 L530,130 L530,152 L521,152 L521,330 L479,330 L479,152 L470,152 Z" fill="#D9DCDF" stroke="#0F2230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="530" y1="152" x2="590" y2="172" stroke="#6B7078" stroke-width="1.5" stroke-linecap="round"/>
+<text x="596" y="176" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Lip at the outer edge</text>
+<text x="596" y="198" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">means the faces are worn</text>
+<line x1="500" y1="330" x2="500" y2="346" stroke="#6B7078" stroke-width="1.5" stroke-linecap="round"/>
+<text x="500" y="362" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">rotor, edge-on</text>
+<text x="440" y="400.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Minimum thickness is cast into the hat</text>
+<text x="440" y="422.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">(&quot;MIN TH&quot;). Front 312 mm: 25 new, 22 min.</text>
+</svg>

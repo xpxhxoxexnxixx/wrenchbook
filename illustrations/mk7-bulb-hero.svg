@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Bulbs and how to reach them</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Driver&#x27;s side headlight from behind.</text>
+<rect x="60" y="120" width="400" height="220" rx="30" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="170" cy="230" r="46" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<text x="170" y="236" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="800" fill="#FFFFFF" text-anchor="middle">LOW</text>
+<circle cx="330" cy="230" r="34" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<text x="330" y="236" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">HIGH</text>
+<line x1="170" y1="110" x2="170" y2="176" stroke="#0E494D" stroke-width="3" stroke-linecap="round"/>
+<path d="M165.2,166.1 L170,176 L174.8,166.1" fill="none" stroke="#0E494D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="184" y="104" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0E494D" text-anchor="start">from above, engine bay</text>
+<line x1="60" y1="300" x2="122" y2="258" stroke="#FF5A28" stroke-width="3" stroke-linecap="round"/>
+<path d="M116.5,267.5 L122,258 L111.1,259.6" fill="none" stroke="#FF5A28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="32" y="372" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8A2A0A" text-anchor="start">or through the wheel-arch liner</text>
+<text x="500" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Halogen low beam</text>
+<text x="500" y="172" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">H7</text>
+<text x="500" y="202" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Halogen high beam / DRL, 2015–17</text>
+<text x="500" y="224" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">H15</text>
+<text x="500" y="254" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Bi-xenon (one bulb, low + high)</text>
+<text x="500" y="276" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">D3S</text>
+<text x="500" y="306" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Full LED</text>
+<text x="500" y="328" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">no bulbs</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Xenon: through the liner, no headlight removal. Halogen lows can go either way.</text>
+</svg>

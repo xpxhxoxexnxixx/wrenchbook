@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Is the flush working?</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Watch the fluid in the bleeder hose at each corner.</text>
+<rect x="50" y="120" width="140" height="110" rx="10" fill="#E9C46A" stroke="#0F2230" stroke-width="2"/>
+<text x="120" y="260" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="middle">New</text>
+<text x="120" y="283" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">clear amber</text>
+<rect x="230" y="120" width="140" height="110" rx="10" fill="#C99A3B" stroke="#0F2230" stroke-width="2"/>
+<text x="300" y="260" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="middle">Mixing</text>
+<text x="300" y="283" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">keep going</text>
+<rect x="410" y="120" width="140" height="110" rx="10" fill="#7A5A22" stroke="#0F2230" stroke-width="2"/>
+<text x="480" y="260" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="middle">Old</text>
+<text x="480" y="283" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">dark, cloudy</text>
+<rect x="590" y="120" width="140" height="110" rx="10" fill="#3B2A12" stroke="#0F2230" stroke-width="2"/>
+<text x="660" y="260" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="middle">Overdue</text>
+<text x="660" y="283" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">near black</text>
+<line x1="80" y1="316" x2="690" y2="316" stroke="#B7B7B4" stroke-width="2" stroke-linecap="round"/>
+<path d="M680.1,320.8 L690,316 L680.1,311.2" fill="none" stroke="#B7B7B4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="400" y="345" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="middle">Close the bleeder once it runs like the left swatch, with no bubbles.</text>
+<rect x="50" y="380" width="700" height="86" rx="10" fill="#F1FAFF" stroke="#75D3D8" stroke-width="2"/>
+<text x="72" y="412" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#0B4664" text-anchor="start">Pedal check, engine running</text>
+<text x="72" y="438" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">High and firm, and it does not sink when you hold steady pressure on it.</text>
+</svg>

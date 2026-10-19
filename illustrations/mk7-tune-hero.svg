@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Flashing a tune</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Phone or laptop, tuning cable, OBD port.</text>
+<rect x="60" y="160" width="120" height="200" rx="18" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<text x="120" y="266" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#FFFFFF" text-anchor="middle">app</text>
+<path d="M180,260 C260,260 280,260 340,260" fill="none" stroke="#0B4664" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="340" y="230" width="100" height="60" rx="8" fill="#4F9AA1" stroke="#0E494D" stroke-width="2"/>
+<text x="390" y="266" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">cable</text>
+<path d="M440,260 L540,260" fill="none" stroke="#0B4664" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="540" y="220" width="140" height="80" rx="10" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<text x="610" y="266" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="middle">OBD port</text>
+<text x="610" y="330" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">under the dash, driver&#x27;s side</text>
+<text x="32" y="430" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Charger on, ignition on, engine off. Touch nothing until it says done.</text>
+<text x="32" y="456" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">Save the stock file first; it&#x27;s your way back.</text>
+</svg>

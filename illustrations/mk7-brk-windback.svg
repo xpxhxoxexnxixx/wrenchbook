@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Rear piston: screw it back in</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">The handbrake mechanism lives behind this piston.</text>
+<circle cx="220" cy="285" r="120" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="220" cy="285" r="92" fill="none" stroke="#B7B7B4" stroke-width="2"/>
+<rect x="150" y="279" width="34" height="12" rx="2" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<rect x="256" y="279" width="34" height="12" rx="2" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<path d="M91.8,211.0 A148,148 0 0 1 348.2,211.0" fill="none" stroke="#FF5A28" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="348.17175976009696" y1="211.0" x2="356.1087333017913" y2="226.87588521980018" stroke="#FF5A28" stroke-width="3" stroke-linecap="round"/>
+<path d="M347.4,220.2 L356.1087333017913,226.87588521980018 L356.0,215.9" fill="none" stroke="#FF5A28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="220" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">Piston face, as you see it with the caliper off</text>
+<text x="420" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#0B4664" text-anchor="start">Turn clockwise and press in</text>
+<text x="420" y="176.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#0F2230" text-anchor="start">at the same time, with a wind-back</text>
+<text x="420" y="200.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#0F2230" text-anchor="start">tool whose pins fit the two slots.</text>
+<rect x="410" y="260" width="360" height="120" rx="8" fill="#FFE9E1" stroke="#FF5A28" stroke-width="2"/>
+<text x="430" y="292" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#8A2A0A" text-anchor="start">No C-clamp, no straight push</text>
+<text x="430" y="318.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">It forces the handbrake screw inside</text>
+<text x="430" y="340.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">and ruins the caliper.</text>
+<text x="420" y="430" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">Stop when it&#x27;s flush and the new pads fit.</text>
+</svg>

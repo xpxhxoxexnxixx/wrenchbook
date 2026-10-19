@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">What the adaptation asks for</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Read it off the new battery&#x27;s label before it goes in.</text>
+<rect x="80" y="110" width="640" height="250" rx="12" fill="#FFFFFF" stroke="#0F2230" stroke-width="2"/>
+<text x="110" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#0B4664" text-anchor="start">VW / OE-style battery label</text>
+<rect x="110" y="178" width="16" height="16" rx="3" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="140" y="192" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="start">Part number</text>
+<text x="360" y="192" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">e.g. 000 915 105 ...</text>
+<rect x="110" y="218" width="16" height="16" rx="3" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="140" y="232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="start">Manufacturer code</text>
+<text x="360" y="232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">a short letter code</text>
+<rect x="110" y="258" width="16" height="16" rx="3" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="140" y="272" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="start">Serial number</text>
+<text x="360" y="272" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">the long one, often a barcode</text>
+<rect x="110" y="298" width="16" height="16" rx="3" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="140" y="312" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F2230" text-anchor="start">Type and capacity</text>
+<text x="360" y="312" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">AGM or EFB, Ah rating</text>
+<text x="80" y="404.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">No VW-style codes on the label? Follow your scan tool&#x27;s prompt for generic</text>
+<text x="80" y="426.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">batteries, and set the type and capacity to match what you fitted.</text>
+</svg>

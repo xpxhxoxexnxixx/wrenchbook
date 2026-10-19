@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Front door panel: what holds it on</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Driver&#x27;s door from inside. Passenger side is a mirror image.</text>
+<path d="M40,120 L440,120 L460,360 Q460,390 430,390 L60,390 Q30,390 30,360 Z" fill="#E9EEF1" stroke="#0F2230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="240" y="170" width="150" height="40" rx="10" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<rect x="260" y="230" width="120" height="26" rx="8" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<rect x="80" y="300" width="300" height="60" rx="10" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="36" cy="200" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="36" cy="300" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="100" cy="388" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="240" cy="388" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="380" cy="388" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="455" cy="300" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="315" cy="190" r="7" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<circle cx="315" cy="262" r="7" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<circle cx="230" cy="330" r="7" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<circle cx="315" cy="150" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="315" y="155" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="405" cy="262" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="405" y="267" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="230" cy="280" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="230" y="285" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="140" cy="420" r="14" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<text x="140" y="425" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<circle cx="512" cy="155" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="512" y="160" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="536" y="160" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">T30 under the pull cover</text>
+<text x="536" y="182" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">pry the cover off first</text>
+<circle cx="512" cy="223" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="512" y="228" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="536" y="228" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">T30 under the armrest</text>
+<text x="536" y="250" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">reach up from below</text>
+<circle cx="512" cy="291" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="512" y="296" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="536" y="296" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Locking post in the pocket</text>
+<text x="536" y="318" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">10 mm wrench, quarter turn</text>
+<circle cx="512" cy="359" r="14" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<text x="512" y="364" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="536" y="364" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Six clips round the edge</text>
+<text x="536" y="386" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">pop them, then lift off the sill</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Lift the panel up off the window sill, then unhook the release cable and unplug the switches.</text>
+</svg>

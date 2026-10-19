@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Which brakes does your GTI have?</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Two systems. Rotor sizes drawn to scale against each other.</text>
+<text x="210" y="106" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="800" fill="#0E494D" text-anchor="middle">Base brakes</text>
+<text x="590" y="106" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="800" fill="#0E494D" text-anchor="middle">Performance brakes</text>
+<line x1="400" y1="92" x2="400" y2="440" stroke="#B7B7B4" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 6"/>
+<circle cx="130" cy="210" r="78" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<circle cx="130" cy="210" r="71" fill="none" stroke="#B7B7B4" stroke-width="1"/>
+<circle cx="130" cy="210" r="35.1" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="130.0" cy="188.94" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="150.02925023317593" cy="203.49210209846362" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="142.3787574132795" cy="227.03789790153638" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="117.62124258672051" cy="227.03789790153638" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="109.97074976682407" cy="203.49210209846362" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="300" cy="210" r="68" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<circle cx="300" cy="210" r="30.6" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="300.0" cy="191.64" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="317.46139763917904" cy="204.32644798327595" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="310.7917372320898" cy="224.85355201672402" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="289.2082627679102" cy="224.85355201672402" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="282.53860236082096" cy="204.32644798327595" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="500" cy="210" r="85" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<circle cx="500" cy="210" r="78" fill="none" stroke="#B7B7B4" stroke-width="1"/>
+<circle cx="500" cy="210" r="38.25" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="500.0" cy="187.05" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="521.8267470489737" cy="202.90805997909496" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="513.4896715401122" cy="228.56694002090504" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="486.5103284598877" cy="228.56694002090504" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="478.1732529510262" cy="202.90805997909496" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="685" cy="210" r="77" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<circle cx="685" cy="210" r="70" fill="none" stroke="#B7B7B4" stroke-width="1"/>
+<circle cx="685" cy="210" r="34.65" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="685.0" cy="189.21" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="704.7724649737762" cy="203.57553668694484" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="697.2200553951606" cy="226.81946331305517" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="672.7799446048394" cy="226.81946331305517" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<circle cx="665.2275350262238" cy="203.57553668694484" r="4" fill="#0F2230" stroke="#0F2230" stroke-width="1"/>
+<text x="130" y="326" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">Front 312 × 25</text>
+<text x="130" y="346" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">vented</text>
+<text x="300" y="326" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">Rear 272 × 10</text>
+<text x="300" y="346" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">solid</text>
+<text x="500" y="326" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">Front 340 × 30</text>
+<text x="500" y="346" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">vented</text>
+<text x="685" y="326" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">Rear 310 × 22</text>
+<text x="685" y="346" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">vented</text>
+<text x="40" y="390.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Rear disc is thin with no gap</text>
+<text x="40" y="412.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">between its two faces</text>
+<text x="420" y="390.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">&quot;GTI&quot; logo on the front caliper clip,</text>
+<text x="420" y="412.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">and a vented gap in the rear disc</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">Retail fitment lists 2019–2021 GTIs with the 340 front; earlier cars got it as an option.</text>
+</svg>

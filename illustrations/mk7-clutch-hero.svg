@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Mk7 clutch stack</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Engine on the left, gearbox on the right.</text>
+<rect x="30" y="140" width="60" height="220" rx="4" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<rect x="90" y="225" width="40" height="50" rx="3" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<rect x="150" y="120" width="46" height="260" rx="8" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<rect x="196" y="160" width="10" height="180" rx="2" fill="#B7B7B4" stroke="#0F2230" stroke-width="2"/>
+<rect x="232" y="150" width="14" height="200" rx="3" fill="#C99A3B" stroke="#936700" stroke-width="2"/>
+<rect x="270" y="130" width="40" height="240" rx="8" fill="#4F9AA1" stroke="#0F2230" stroke-width="2"/>
+<rect x="350" y="210" width="56" height="80" rx="8" fill="#75D3D8" stroke="#0E494D" stroke-width="2"/>
+<path d="M430,120 L560,150 L560,350 L430,380 Z" fill="#C9CED3" stroke="#0F2230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="110" cy="100" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="110" y="105" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="178" cy="100" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="178" y="105" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="239" cy="100" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="239" y="105" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="290" cy="100" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="290" y="105" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<circle cx="378" cy="100" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="378" y="105" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">5</text>
+<circle cx="44" cy="405" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="44" y="410" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="66" y="410" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Crank: rear main seal sits here</text>
+<circle cx="430" cy="405" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="430" y="410" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="452" y="410" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Dual-mass flywheel: 12 mm XZN, 60 Nm + 90°, new</text>
+<circle cx="44" cy="435" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="44" y="440" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="66" y="440" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Disc: hub marking faces the gearbox side</text>
+<circle cx="430" cy="435" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="430" y="440" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="452" y="440" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Pressure plate: 6 bolts, 20 Nm, new</text>
+<circle cx="44" cy="465" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="44" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="66" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Release bearing (slave): 3 bolts, 12 Nm</text>
+<circle cx="430" cy="465" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="430" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">6</text>
+<text x="452" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="start">Bell housing bolts: 18 mm, gearbox flush first</text>
+</svg>

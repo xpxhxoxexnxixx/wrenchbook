@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Walnut blasting the intake valves</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Manifold off, one port at a time, valves closed.</text>
+<rect x="60" y="130" width="420" height="250" rx="10" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<rect x="110" y="150" width="60" height="80" rx="8" fill="#3B2A12" stroke="#0F2230" stroke-width="2"/>
+<rect x="210" y="150" width="60" height="80" rx="8" fill="#3B2A12" stroke="#0F2230" stroke-width="2"/>
+<rect x="310" y="150" width="60" height="80" rx="8" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<rect x="410" y="150" width="60" height="80" rx="8" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<text x="170" y="140" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">before</text>
+<text x="370" y="140" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">after</text>
+<rect x="150" y="300" width="40" height="60" rx="4" fill="#FF5A28" stroke="#8A2A0A" stroke-width="2"/>
+<path d="M170,300 L170,230" fill="none" stroke="#8A2A0A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="230" cy="330" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="230" y="335" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="330" cy="330" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="330" y="335" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="540" cy="145" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="540" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="564" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Nozzle into the port</text>
+<text x="564" y="172" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">media in, shop-vac out</text>
+<circle cx="540" cy="217" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="540" y="222" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="564" y="222" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Valves closed</text>
+<text x="564" y="244" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">that cylinder at TDC</text>
+<text x="32" y="440" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Turn the engine by hand on the crank bolt (24 mm), clockwise, until that port&#x27;s valves are shut.</text>
+<text x="32" y="466" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">Vacuum every port clean before the manifold goes back on.</text>
+</svg>

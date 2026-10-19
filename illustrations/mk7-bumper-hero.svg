@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Front bumper: where the screws are</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Nearly all T25. Bag them by location; lengths differ.</text>
+<path d="M70,130 L410,130 Q440,130 445,170 L455,300 Q455,330 425,330 L55,330 Q25,330 25,300 L35,170 Q40,130 70,130 Z" fill="#E9EEF1" stroke="#0F2230" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="150" y="145" width="180" height="40" rx="8" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<rect x="130" y="240" width="220" height="50" rx="12" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<circle cx="175" cy="138" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="305" cy="138" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="205" cy="196" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="275" cy="196" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="42" cy="210" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="46" cy="240" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="50" cy="270" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="36" cy="180" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="60" cy="300" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="438" cy="210" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="434" cy="240" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="430" cy="270" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="444" cy="180" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="420" cy="300" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="90" cy="326" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="160" cy="326" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="240" cy="326" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="320" cy="326" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="390" cy="326" r="6" fill="#FF5A28" stroke="#FF5A28" stroke-width="2"/>
+<circle cx="240" cy="110" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="240" y="115" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="240" cy="220" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="240" y="225" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="80" cy="190" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="80" y="195" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="240" cy="362" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="240" y="367" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<circle cx="494" cy="145" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="494" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="518" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Upper grille: 2</text>
+<text x="518" y="172" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">pull forward, then up</text>
+<circle cx="494" cy="215" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="494" y="220" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="518" y="220" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Bumper to cross-member: 2</text>
+<text x="518" y="242" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">behind the upper grille, if fitted</text>
+<circle cx="494" cy="285" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="494" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="518" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Each wheel arch: about 5 + 1</text>
+<text x="518" y="312" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">plus the vertical one into the fender</text>
+<circle cx="494" cy="355" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="494" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="518" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Underside and belly pan</text>
+<text x="518" y="382" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">2 per side plus the pan screws</text>
+<text x="32" y="440" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Then pop each side out of its fender guide, pull it forward a few inches,</text>
+<text x="32" y="464" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">and unplug the fog lights and any headlight-washer hose before it comes free.</text>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Which headlights do you have?</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Look at the lens with the lights on.</text>
+<rect x="30" y="110" width="220" height="140" rx="40" fill="#E9EEF1" stroke="#0F2230" stroke-width="2"/>
+<circle cx="140" cy="180" r="46" fill="#C9CED3" stroke="#6B7078" stroke-width="2"/>
+<circle cx="140" cy="180" r="10" fill="#FFE58A" stroke="#936700" stroke-width="2"/>
+<text x="140" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#0E494D" text-anchor="middle">Halogen</text>
+<text x="140" y="316" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="middle">Reflector bowl,</text>
+<text x="140" y="338" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="middle">no lens dome</text>
+<text x="140" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">2015–2021 base cars</text>
+<rect x="290" y="110" width="220" height="140" rx="40" fill="#E9EEF1" stroke="#0F2230" stroke-width="2"/>
+<path d="M330,150 Q400,110 470,150" fill="none" stroke="#75D3D8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M330,214 Q400,252 470,214" fill="none" stroke="#75D3D8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="400" cy="182" r="34" fill="#CFE6F2" stroke="#0B4664" stroke-width="2"/>
+<text x="400" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#0E494D" text-anchor="middle">Bi-xenon</text>
+<text x="400" y="316" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="middle">Round projector lens,</text>
+<text x="400" y="338" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="middle">U-shaped LED DRLs</text>
+<text x="400" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">2015–2017 SE, Autobahn</text>
+<rect x="550" y="110" width="220" height="140" rx="40" fill="#E9EEF1" stroke="#0F2230" stroke-width="2"/>
+<rect x="580" y="150" width="44" height="10" rx="4" fill="#75D3D8" stroke="#0E494D" stroke-width="2"/>
+<rect x="634" y="150" width="44" height="10" rx="4" fill="#75D3D8" stroke="#0E494D" stroke-width="2"/>
+<rect x="688" y="150" width="44" height="10" rx="4" fill="#75D3D8" stroke="#0E494D" stroke-width="2"/>
+<circle cx="660" cy="205" r="22" fill="#CFE6F2" stroke="#0B4664" stroke-width="2"/>
+<text x="660" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#0E494D" text-anchor="middle">Full LED</text>
+<text x="660" y="316" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="middle">LED strips and</text>
+<text x="660" y="338" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#0F2230" text-anchor="middle">projector, no bulbs</text>
+<text x="660" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">2018–2021 upper trims</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">Full LED units have no replaceable bulbs: a failed module means a new housing.</text>
+</svg>

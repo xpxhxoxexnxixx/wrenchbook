@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Reading the old parts</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">What the clutch you took out is telling you.</text>
+<circle cx="160" cy="250" r="110" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<circle cx="160" cy="250" r="40" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="230.47694655894313" cy="275.65151074942514" r="9" fill="#4A3B6B" stroke="#4A3B6B" stroke-width="2"/>
+<circle cx="102.54666676607665" cy="298.20907072649044" r="9" fill="#4A3B6B" stroke="#4A3B6B" stroke-width="2"/>
+<circle cx="146.97638667498023" cy="176.13941852408442" r="9" fill="#4A3B6B" stroke="#4A3B6B" stroke-width="2"/>
+<text x="160" y="392" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">Flywheel face</text>
+<text x="160" y="412" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">blue-black spots = heat</text>
+<rect x="330" y="150" width="150" height="200" rx="10" fill="#C99A3B" stroke="#936700" stroke-width="2"/>
+<circle cx="370" cy="190" r="7" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<circle cx="440" cy="190" r="7" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<circle cx="370" cy="250" r="7" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<circle cx="440" cy="250" r="7" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<circle cx="370" cy="310" r="7" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<circle cx="440" cy="310" r="7" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<text x="405" y="392" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="middle">Disc</text>
+<text x="405" y="412" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="middle">rivets near flush = worn out</text>
+<rect x="540" y="150" width="220" height="200" rx="10" fill="#F1FAFF" stroke="#75D3D8" stroke-width="2"/>
+<text x="556" y="182" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#0B4664" text-anchor="start">Dual-mass test</text>
+<text x="556" y="210.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Rock the two halves</text>
+<text x="556" y="232.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">against each other.</text>
+<text x="556" y="254.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Clunk or lots of free</text>
+<text x="556" y="277.2" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">play: replace it.</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Oil on the disc or bell housing means the rear main seal is leaking. Replace it now.</text>
+</svg>

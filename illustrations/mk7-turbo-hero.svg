@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Turbo: what disconnects</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Rear of the engine, seen from the passenger side. Not to scale.</text>
+<rect x="40" y="120" width="200" height="260" rx="10" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="330" cy="220" r="70" fill="#4F9AA1" stroke="#0E494D" stroke-width="2"/>
+<circle cx="330" cy="220" r="22" fill="#75D3D8" stroke="#0E494D" stroke-width="2"/>
+<rect x="250" y="280" width="140" height="70" rx="10" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<path d="M390,330 C440,350 450,400 440,450" fill="none" stroke="#0F2230" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="250" cy="300" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="250" y="305" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="262" cy="360" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="262" y="365" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="300" cy="140" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="300" y="145" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="410" cy="300" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="410" y="305" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<circle cx="440" cy="450" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="440" y="455" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">5</text>
+<circle cx="500" cy="135" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="500" y="140" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="524" y="140" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Turbo-to-head nuts</text>
+<text x="524" y="162" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">new nuts, studs and gasket</text>
+<circle cx="500" cy="197" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="500" y="202" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="524" y="202" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Oil return</text>
+<text x="524" y="224" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">8 mm triple-square, new O-rings</text>
+<circle cx="500" cy="259" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="500" y="264" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="524" y="264" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Oil feed + 2 coolant lines</text>
+<text x="524" y="286" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">new O-rings; T30 for clearance</text>
+<circle cx="500" cy="321" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="500" y="326" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="524" y="326" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Lower bracket</text>
+<text x="524" y="348" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">13 mm to engine, 6 mm hex to turbo</text>
+<circle cx="500" cy="383" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="500" y="388" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="524" y="388" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Downpipe clamp + brackets</text>
+<text x="524" y="410" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">6 mm hex clamp, 13 mm nuts</text>
+</svg>

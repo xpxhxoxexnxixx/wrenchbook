@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Catch can: where it sits in the loop</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Recirculating: nothing vents to the air.</text>
+<rect x="40" y="300" width="260" height="110" rx="10" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<rect x="60" y="270" width="180" height="34" rx="6" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<rect x="330" y="150" width="70" height="130" rx="14" fill="#75D3D8" stroke="#0E494D" stroke-width="2"/>
+<rect x="300" y="120" width="140" height="24" rx="8" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<path d="M150,270 C150,200 260,190 330,200" fill="none" stroke="#FF5A28" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M400,190 C460,180 500,200 540,240" fill="none" stroke="#0B4664" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="150" cy="252" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="150" y="257" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<circle cx="365" cy="300" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="365" y="305" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<circle cx="540" cy="270" r="14" fill="#0B4664" stroke="#0B4664" stroke-width="2"/>
+<text x="540" y="275" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<circle cx="580" cy="145" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="580" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="604" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Breather plate</text>
+<text x="604" y="172" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">replaces the separator</text>
+<circle cx="580" cy="211" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="580" y="216" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="604" y="216" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Catch can</text>
+<text x="604" y="238" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">empty it at oil changes</text>
+<circle cx="580" cy="277" r="14" fill="#0E494D" stroke="#0E494D" stroke-width="2"/>
+<text x="580" y="282" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="604" y="282" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Back to the intake</text>
+<text x="604" y="304" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7078" text-anchor="start">the factory return path</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">Freezing weather: check and empty it often, or take it off for winter.</text>
+</svg>

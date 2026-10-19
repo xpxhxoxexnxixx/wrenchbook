@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Front: which bolt is which</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Looking at the back of the brake from inside the wheel well.</text>
+<circle cx="230" cy="330" r="210" fill="#D9DCDF" stroke="#0F2230" stroke-width="2"/>
+<circle cx="230" cy="330" r="84" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="268" cy="352" r="6" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<rect x="392" y="122" width="96" height="34" rx="6" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<rect x="392" y="436" width="96" height="34" rx="6" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<circle cx="440" cy="139" r="11" fill="none" stroke="#0F2230" stroke-width="2" stroke-dasharray="3 3"/>
+<circle cx="440" cy="453" r="11" fill="none" stroke="#0F2230" stroke-width="2" stroke-dasharray="3 3"/>
+<rect x="380" y="156" width="120" height="280" rx="20" fill="#4F9AA1" stroke="#0F2230" stroke-width="2"/>
+<circle cx="512" cy="182" r="12" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<circle cx="512" cy="410" r="12" fill="#0F2230" stroke="#0F2230" stroke-width="2"/>
+<line x1="452" y1="139" x2="572" y2="112" stroke="#6B7078" stroke-width="1.5" stroke-linecap="round"/>
+<text x="580" y="110" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Carrier bolts × 2</text>
+<text x="580" y="132" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">behind · 21 mm · 200 Nm</text>
+<line x1="525" y1="182" x2="572" y2="182" stroke="#6B7078" stroke-width="1.5" stroke-linecap="round"/>
+<text x="580" y="180" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Guide bolts × 2</text>
+<text x="580" y="202" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">13 mm or T45 · 35 Nm · new</text>
+<line x1="274" y1="352" x2="572" y2="300" stroke="#6B7078" stroke-width="1.5" stroke-linecap="round"/>
+<text x="580" y="296" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0F2230" text-anchor="start">Rotor set screw</text>
+<text x="580" y="318" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">T30 · 4 Nm</text>
+<text x="580" y="420" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">Same pair at the bottom.</text>
+</svg>

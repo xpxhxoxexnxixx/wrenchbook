@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+<rect width="800" height="500" fill="#F9F9F5"/>
+<text x="32" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#0B4664" text-anchor="start">Cabin filter: passenger footwell</text>
+<text x="32" y="70" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#6B7078" text-anchor="start">Behind and under the glovebox, looking up from the footwell.</text>
+<rect x="60" y="110" width="420" height="120" rx="14" fill="#C9CED3" stroke="#0F2230" stroke-width="2"/>
+<text x="270" y="176" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#0F2230" text-anchor="middle">Glovebox</text>
+<rect x="150" y="250" width="240" height="70" rx="8" fill="#6B7078" stroke="#0F2230" stroke-width="2"/>
+<text x="270" y="292" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Filter cover</text>
+<line x1="270" y1="330" x2="270" y2="400" stroke="#FF5A28" stroke-width="3" stroke-linecap="round"/>
+<path d="M265.2,390.1 L270,400 L274.8,390.1" fill="none" stroke="#FF5A28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="290" y="380" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#8A2A0A" text-anchor="start">slide filter down and out</text>
+<rect x="520" y="150" width="250" height="200" rx="10" fill="#F1FAFF" stroke="#75D3D8" stroke-width="2"/>
+<text x="540" y="182" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#0B4664" text-anchor="start">Before it goes in</text>
+<text x="540" y="210.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">Note the airflow arrow</text>
+<text x="540" y="232.4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">on the old filter and</text>
+<text x="540" y="254.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">fit the new one the</text>
+<text x="540" y="277.2" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#0F2230" text-anchor="start">same way round.</text>
+<text x="32" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#6B7078" text-anchor="start">Ignition off: the blower sits right behind the filter.</text>
+</svg>
