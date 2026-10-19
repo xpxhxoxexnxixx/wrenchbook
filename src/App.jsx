@@ -388,8 +388,10 @@ const Splash = ({ onDone }) => {
 
 /** A guide whose pre-question is a brand/kit choice hides its "Aftermarket options" once a specific brand is chosen: the user already picked.
  *  Options flagged `brand: true` are specific products; an "other" option leaves the list visible. */
+/* Aftermarket rows visible for the current answers. Every count and list uses this, so a section never says "(2)" and opens empty. */
+const amVisible = (g, choice) => (g.aftermarket || []).filter(x => vis(x, choice));
 const showAftermarket = (g, choice) => {
-  if (!g.aftermarket || !g.aftermarket.length) return false;
+  if (!amVisible(g, choice).length) return false;
   // Works for one question or several: hide the list if any chosen option is a specific brand/kit.
   const qs = g.variants ? (g.variants.questions || [g.variants]) : [];
   const chosen = chosenIds(choice);
@@ -953,12 +955,12 @@ function GuideBody({ go, back, g, initialChoice, onChoice, backLabel, redlineMod
       {showAftermarket(g, choice) ? (
         <div className="mt-2 rounded-sm shadow-sm border-2" style={{ borderColor: "#E5FE52", background: "#F3FAE7" }}>
           <button onClick={() => setShowAM(x => !x)} aria-expanded={showAM} className="flex w-full items-center justify-between px-3 py-3 text-left">
-            <span className="flex items-center gap-2 font-semibold" style={{ color: "#212700" }}><span className="flex h-7 w-7 items-center justify-center rounded-sm" style={{ background: "#E5FE52" }}><Zap size={16} fill="#212700" style={{ color: "#212700" }} /></span>Aftermarket options <span className="font-normal opacity-60">({g.aftermarket.length})</span></span>
+            <span className="flex items-center gap-2 font-semibold" style={{ color: "#212700" }}><span className="flex h-7 w-7 items-center justify-center rounded-sm" style={{ background: "#E5FE52" }}><Zap size={16} fill="#212700" style={{ color: "#212700" }} /></span>Aftermarket options <span className="font-normal opacity-60">({amVisible(g, choice).length})</span></span>
             <ChevronDown size={18} className={`text-gray-500 transition-transform ${showAM ? "rotate-180" : ""}`} />
           </button>
           {showAM ? (
             <div className="divide-y divide-gray-200 border-t border-gray-200">
-              {g.aftermarket.filter(x => vis(x, choice)).map((a, i) => (
+              {amVisible(g, choice).map((a, i) => (
                 <div key={i} className="p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div><div className="font-semibold">{a.name}</div><div className="text-sm text-gray-600">{a.note}</div></div>
@@ -1074,7 +1076,7 @@ function KitScreen({ go, back, guide: g, choice }) {
       {showAftermarket(g, choice) ? (<>
         <h2 className="mt-6 mb-2 font-bold text-lg">Aftermarket options</h2>
         <div className="card rounded-sm bg-white shadow-sm divide-y divide-gray-200">
-          {g.aftermarket.map((a, i) => <Row key={i} k={`a${i}`} name={a.name} note={(a.signal ? a.signal + " · " : "") + (a.note || "")} price={a.price} links={a.links} />)}
+          {amVisible(g, choice).map((a, i) => <Row key={i} k={`a${i}`} name={a.name} note={(a.signal ? a.signal + " · " : "") + (a.note || "")} price={a.price} links={a.links} />)}
         </div>
       </>) : null}
       <h2 className="mt-6 mb-2 font-bold text-lg">Tools</h2>
