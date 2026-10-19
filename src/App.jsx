@@ -662,6 +662,13 @@ const CatArt = ({ name, size = 48 }) => {
       <circle cx="24" cy="26" r="1.6" fill={c.pale} />
       <rect x="20" y="6" width="8" height="4" rx="1" fill={c.teal} />
     </>),
+    "Track & safety": (<>
+      <path d="M8 42 V20 q0 -12 16 -12 q16 0 16 12 V42" fill="none" stroke={c.navy} strokeWidth="4.5" strokeLinecap="round" />
+      <path d="M8 26 H40" stroke={c.mid} strokeWidth="3" strokeLinecap="round" />
+      <path d="M17 26 L24 40 L31 26" fill="none" stroke={c.teal} strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round" />
+      <circle cx="24" cy="40" r="3" fill={c.deep} />
+      <rect x="4" y="41" width="10" height="4" rx="1.5" fill={c.deep} /><rect x="34" y="41" width="10" height="4" rx="1.5" fill={c.deep} />
+    </>),
     Interior: (<>
       <path d="M12 8 q-4 0 -4 4 v16 q0 4 4 4 h8 v-24 z" fill={c.navy} />
       <path d="M10 32 h12 l4 8 h-20 z" fill={c.teal} />
