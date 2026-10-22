@@ -135,7 +135,7 @@ const VariantModal = ({ v, onPick, step, redlineMode }) => {
   );
 };
 
-const TIER = { oe: "OE · VW box", oem: "OEM · same part, maker's box", aftermarket: "Aftermarket" };
+const TIER = { oe: "OE · factory part", oem: "OEM · same part, maker's box", aftermarket: "Aftermarket" };
 
 
 /* "When to expect it": typical mileage/age range, earliest reported, what shortens it. Variant-aware via `only`. */
@@ -653,6 +653,13 @@ const CatArt = ({ name, size = 48 }) => {
       <rect x="18" y="4" width="12" height="6" rx="1" fill={c.teal} stroke={c.deep} strokeWidth="1" />
       <rect x="18" y="40" width="12" height="4" rx="1" fill={c.teal} stroke={c.deep} strokeWidth="1" />
     </>),
+    "Fuel system": (<>
+      <path d="M24 6 C24 6 12 20 12 28 a12 12 0 0 0 24 0 C36 20 24 6 24 6 z" fill={c.navy} />
+      <path d="M18 29 a6 6 0 0 0 6 6" fill="none" stroke={c.light} strokeWidth="3" strokeLinecap="round" />
+      <rect x="38" y="14" width="6" height="26" rx="2" fill={c.teal} />
+      <rect x="39.5" y="27" width="3" height="11" rx="1" fill={c.mid} />
+      <rect x="4" y="41" width="40" height="3" rx="1.5" fill={c.deep} />
+    </>),
     Steering: (<>
       <circle cx="24" cy="26" r="17" fill="none" stroke={c.navy} strokeWidth="4.5" />
       <circle cx="24" cy="26" r="4.5" fill={c.navy} />
@@ -796,6 +803,8 @@ function Browse({ nav, go, back, db, redlineMode, onToggleRedline }) {
   const range = g => `${g.from}–${g.to || "present"}`;
   // A generation with a single live engine skips the engine picker and goes straight to categories (R32, Mk7).
   const livePts = g => (db.powertrains[g.id] || []).filter(p => p.live);
+  // A generation whose live powertrains all share one engine code is split by body style, not engine (E9x M3: E92/E90/E93).
+  const pickerNoun = g => { const pts = livePts(g); return pts.length > 1 && pts.every(p => p.code === pts[0].code) ? "Body styles" : "Engines"; };
   const pickGen = g => { const pts = livePts(g); go(pts.length === 1 ? { ...nav, gen: g, pt: pts[0] } : { ...nav, gen: g }); };
   const Row = ({ title, sub, subAbove, live, onClick, art, rightMark }) => (
     <button disabled={!live} onClick={onClick} className={`card flex w-full items-center justify-between rounded-sm bg-white px-4 py-4 text-left shadow-sm ${live ? "" : "opacity-50"}`}>
@@ -807,7 +816,7 @@ function Browse({ nav, go, back, db, redlineMode, onToggleRedline }) {
   if (!model) { title = brand.name; backLabel = "Home"; list = db.models[brand.id].map(m => <Row key={m.id} title={m.name} live={m.live} onClick={() => go({ ...nav, model: m })} />); }
   else if (!gen) { title = `${brand.name} ${model.name}`; backLabel = "Models"; list = (db.gens[model.id] || []).map(g => <Row key={g.id} title={range(g)} sub={g.name} subAbove live={g.live} onClick={() => pickGen(g)} />); }
   else if (!pt) { title = `${model.name} ${gen.name} · ${range(gen)}`; backLabel = "Model years"; list = (db.powertrains[gen.id] || []).map(p => <Row key={p.id} title={`${p.name} · ${p.code}`} sub={p.note} live={p.live} onClick={() => go({ ...nav, pt: p })} />); }
-  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = livePts(gen).length === 1 ? "Model years" : "Engines"; const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const inCat = mine.filter(t => t.cat === c); const nAll = inCat.length; const nRed = inCat.filter(t => t.redline).length; const n = redlineMode ? nRed : nAll; const showTach = redlineMode && nRed > 0; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} rightMark={showTach ? <RedlineIcon on size={22} /> : null} onClick={() => go({ ...nav, cat: c })} />; }); }
+  else if (!cat) { title = `${model.name} ${gen.name} ${pt.name}`; backLabel = livePts(gen).length === 1 ? "Model years" : pickerNoun(gen); const mine = db.tasks.filter(t => t.powertrainId === pt.id); list = db.categories.map(c => { const inCat = mine.filter(t => t.cat === c); const nAll = inCat.length; const nRed = inCat.filter(t => t.redline).length; const n = redlineMode ? nRed : nAll; const showTach = redlineMode && nRed > 0; return <Row key={c} title={c} sub={n ? `${n} guide${n>1?"s":""}` : "Nothing yet"} live={n > 0} art={<CatArt name={c} size={44} />} rightMark={showTach ? <RedlineIcon on size={22} /> : null} onClick={() => go({ ...nav, cat: c })} />; }); }
   else { title = cat; backLabel = `${pt.name} categories`; list = db.tasks.filter(t => t.cat === cat && t.powertrainId === pt.id && (!redlineMode || t.redline)).map(t => <TaskCard key={t.id} t={t} onOpen={() => go({ screen: "guide", gid: t.guideId || t.id })} />); }
   // The task list is the one screen whose title (the category) says nothing about the car, so the vehicle sits above it.
   const above = cat && pt ? `${model.name} ${gen.name} · ${shortEngine(pt)}` : null;
