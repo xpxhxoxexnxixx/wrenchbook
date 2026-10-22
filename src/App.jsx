@@ -660,6 +660,12 @@ const CatArt = ({ name, size = 48 }) => {
       <rect x="39.5" y="27" width="3" height="11" rx="1" fill={c.mid} />
       <rect x="4" y="41" width="40" height="3" rx="1.5" fill={c.deep} />
     </>),
+    "Engine swaps": (<>
+      <rect x="6" y="16" width="22" height="18" rx="3" fill={c.navy} />
+      <rect x="10" y="10" width="14" height="6" rx="1.5" fill={c.teal} />
+      <path d="M31 18 h9 l-3 -4 M40 30 h-9 l3 4" fill="none" stroke={c.mid} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="4" y="38" width="40" height="3" rx="1.5" fill={c.deep} />
+    </>),
     Steering: (<>
       <circle cx="24" cy="26" r="17" fill="none" stroke={c.navy} strokeWidth="4.5" />
       <circle cx="24" cy="26" r="4.5" fill={c.navy} />
